@@ -12,6 +12,7 @@ class RenderInfo;
 
 class BLSDLRenderer {
 public:
+    BLSDLRenderer() = default;
     BLSDLRenderer(SDL_Renderer* renderer);
 
     void render();
