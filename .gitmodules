@@ -1,9 +1,6 @@
-[submodule "extern/imgui"]
-	path = extern/imgui
-	url = https://github.com/ocornut/imgui.git
-[submodule "extern/googletest"]
-	path = extern/googletest
-	url = https://github.com/google/googletest.git
 [submodule "xcpp_build_tools"]
 	path = xcpp_build_tools
 	url = https://github.com/tessellates/xcpp_build_tools.git
+[submodule "extern/imgui"]
+	path = extern/imgui
+	url = https://github.com/ocornut/imgui.git

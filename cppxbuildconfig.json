@@ -1,0 +1,27 @@
+{
+    "cmake": "cmake",
+    "currentConfig": "opt",
+    "builddir": "build",
+    "debugdir": "Debug",
+    "optdir": "Release",
+    "targets": [
+        {
+            "name": "blinklite",
+            "path": ".",
+            "exe": "staging/main"
+        },
+        {
+            "name": "connect4",
+            "path": ".",
+            "exe": "examples/connect4/connect4"
+        },
+        {
+            "name": "check",
+            "path": ".",
+            "exe": "examples/textureCheck/textureCheck"
+        }
+    ],
+    "cmake_actions": [],
+    "default_cmake_variables": [ {"name":"BUILD_EXAMPLES","value":"ON"} ],
+    "env": [ {"name":"SDL_VIDEODRIVER", "value":"cocoa"} ]
+}
