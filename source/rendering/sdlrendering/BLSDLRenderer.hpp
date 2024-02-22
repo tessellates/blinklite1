@@ -19,9 +19,8 @@ public:
     void addRenderTarget(const RenderInfo& info);
     void renderInfo(const RenderInfo& info);
 
-private:
+public:
     std::array<BLSDLRenderLayer, 10> layers;
     SDL_Renderer* sdlRenderer;
     BLSDLTextureManager textureManager;
 };
-    
