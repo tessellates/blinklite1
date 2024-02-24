@@ -43,11 +43,13 @@ void BLApplication::loop()
     }
     else
     {
+        int w, h;
+        SDL_QueryTexture(testmod,NULL, NULL, &w, &h);
         int window_width, window_height;
         // Get window size
         SDL_GetWindowSize(window, &window_width, &window_height);
         // Set texture width and height to match the screen height
-        int texture_width = window_height; // Texture's width is the same as the screen height
+        int texture_width = window_height * w/h; // Texture's width is the same as the screen height
         int texture_height = window_height; // Texture's height
         // Calculate centered position
         int x_position = (window_width - texture_width) / 2;
@@ -62,11 +64,16 @@ void BLApplication::loop()
         if (isBloom)
         {
             SDL_SetRenderDrawColor(renderer, 0,0,0,0);
-            int w, h;
-            SDL_QueryTexture(testmod,NULL, NULL, &w, &h);
             Uint32 *upixels = (Uint32*)surfaceMod->pixels;
             std::vector<Uint32> pixelVector(upixels, upixels + w*h);
-            applyBloomEffect(pixelVector, w, h);
+
+            int x,y;
+            SDL_GetMouseState(&x,&y);
+            x -= x_position;
+            y -= y_position;
+            float xsc = float(w)/float(texture_width);
+            float ysc = float(h)/float(texture_height);
+            applyBloomEffect(pixelVector, w, h, 100, xsc * x,ysc * y);
             int pitch;
             void *pixels;
             SDL_LockTexture(testmod, NULL, &pixels, &pitch);
@@ -126,7 +133,7 @@ void BLApplication::init()
     #endif
 
     // Create window with SDL_Renderer graphics context
-    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_FULLSCREEN_DESKTOP);
+    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_FULLSCREEN);
     window = SDL_CreateWindow("BLINKLITE", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0, 0, window_flags);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
     std::cout << "blendmode:" << SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND) <<" -- " << SDL_BLENDMODE_BLEND << std::endl;
