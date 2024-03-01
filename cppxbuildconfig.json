@@ -13,5 +13,5 @@
     ],
     "cmake_actions": [],
     "default_cmake_variables": [],
-    "env": [ {"name":"SDL_VIDEO_DRIVER", "value":"cocoa"} ]
+    "env": [ {"name":"SDL_VIDEODRIVER", "value":"cocoa"} ]
 }

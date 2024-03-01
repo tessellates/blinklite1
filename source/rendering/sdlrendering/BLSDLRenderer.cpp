@@ -1,4 +1,7 @@
+#include <iostream>
+
 #include "BLSDLRenderer.hpp"
+
 
 BLSDLRenderer::BLSDLRenderer(SDL_Renderer* renderer) : sdlRenderer(renderer) {}
 
@@ -22,27 +25,19 @@ void BLSDLRenderer::renderInfo(const RenderInfo& info)
 
     SDL_Texture* texture = textureManager.getTexture(info.textureID);
     if (texture == nullptr) {
+        std::cout << "textureID:" << info.textureID << " not found" << std::endl;
         // Handle cases where texture is not found, such as drawing a placeholder or logging an error
         return;
     }
 
-    SDL_Rect destRect;
-    destRect.x = static_cast<int>(info.x);
-    destRect.y = static_cast<int>(info.y);
-    destRect.w = static_cast<int>(info.width * info.scale); // Apply scale to width
-    destRect.h = static_cast<int>(info.height * info.scale); // Apply scale to height
-
     // Calculate the rotation center
-    SDL_Point center = {destRect.w / 2, destRect.h / 2};
+    SDL_Point center = {info.dest.w / 2, info.dest.h / 2};
 
-    // Determine the flip flags
-    SDL_RendererFlip flip = SDL_FLIP_NONE;
-    if (info.flip == RenderInfo::Flip::Horizontal) {
-        flip = SDL_FLIP_HORIZONTAL;
-    } else if (info.flip == RenderInfo::Flip::Vertical) {
-        flip = SDL_FLIP_VERTICAL;
+    const SDL_Rect* clip = &info.clip;
+    if (info.clip.h == 0 || info.clip.w == 0)
+    {
+        clip = nullptr;
     }
-
     // Perform the actual rendering
-    SDL_RenderCopyEx(sdlRenderer, texture, nullptr, &destRect, info.rotation, &center, flip);
+    SDL_RenderCopyEx(sdlRenderer, texture, clip, &info.dest, info.rotation, &center, info.flip);
 }
