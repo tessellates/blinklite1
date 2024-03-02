@@ -2,19 +2,12 @@
 #include "BlinkGame.hpp"
 #include "BlinkMenu.hpp"
 #include "TextureUtility.hpp"
+#include "SDLUtil.hpp"
 
 #include <iostream>
 #include <SDL_image.h>
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_sdlrenderer2.h"
-#include "SDLUtil.hpp"
-
-
-void toggleFullscreen(SDL_Window* window) {
-    Uint32 fullscreenFlag = SDL_WINDOW_FULLSCREEN;
-    Uint32 isFullscreen = SDL_GetWindowFlags(window) & fullscreenFlag;
-    SDL_SetWindowFullscreen(window, isFullscreen ? 0 : fullscreenFlag);
-}
 
 BLApplication::BLApplication()
 {
@@ -31,6 +24,8 @@ BLApplication::BLApplication()
     #ifdef SDL_HINT_IME_SHOW_UI
     SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
     #endif
+
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 }
 
 int BLApplication::run()
@@ -44,6 +39,7 @@ int BLApplication::run()
 
 void BLApplication::loop()
 {
+    //SDL_RenderSetLogicalSize(renderer, xResolution, yResolution);
 
     while (SDL_PollEvent(&event))
     {
@@ -60,7 +56,11 @@ void BLApplication::loop()
             }
             if (event.key.keysym.sym == SDLK_b)
             {
-                toggleFullscreen(window);
+                toggleFullscreen();
+            }
+            if (event.key.keysym.sym == SDLK_q)
+            {
+                //changeResolution(1200, 1200);
             }
         }
     }
@@ -75,8 +75,8 @@ void BLApplication::loop()
     {
         // Set up the destination rectangle
         SDL_Rect dest_rect {0, 0};
-        dest_rect.w = blRenderer.externals().x;
-        dest_rect.h = blRenderer.externals().y;
+        dest_rect.w = blRenderer.internalUnits.x;
+        dest_rect.h = blRenderer.internalUnits.y;
         RenderInfo info {};
         info.dest = dest_rect;
         info.textureID = 0;
@@ -90,30 +90,28 @@ void BLApplication::loop()
     if (imguiToggle)
     {
         ImGui_ImplSDLRenderer2_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
+        ImGui_ImplSDL2_NewFrame();  
+ 
+        float x = (float)xResolution/display.w;
+        float y = (float)yResolution/display.h;
 
-        //io_->DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
-        //io_->DisplaySize = ImVec2((float)x_resolution, (float)y_resolution);
-
-        //io_->MousePos.x *= std::ceil((float)x_resolution/float(display.w));
-        //io_->MousePos.y *= std::ceil((float)y_resolution/float(display.h));
-        //io_->MousePos.y *= std::ceil(pViewport->DpiScale);
+        blRenderer.applyResolution(display.w, display.h); 
+        menu->applyResolution(display.w, display.h);
+        
         ImGui::NewFrame();
-        //io_->DisplaySize = ImVec2((float)450, (float)450);
-  		//ImGui::ShowDemoWindow();
-
+        //SDL_RenderSetScale(renderer, io_->DisplayFramebufferScale.x, io_->DisplayFramebufferScale.y);
+        //SDL_SetWindowSize(window, xResolution/io_->DisplayFramebufferScale.x, yResolution/io_->DisplayFramebufferScale.x);
         menu->run();
         ImGui::Render();
-        SDL_RenderSetScale(renderer, io_->DisplayFramebufferScale.x, io_->DisplayFramebufferScale.y);
-        blRenderer.setInternalContext({(int)((x_resolution - y_resolution)/2/io_->DisplayFramebufferScale.x), 0, (int)(y_resolution/io_->DisplayFramebufferScale.x), (int)(y_resolution/io_->DisplayFramebufferScale.y)});
-        //SDL_RenderClear(renderer);
-        //ImGui::GetDrawData()->FramebufferScale  = {2,2};
+        SDL_RenderSetLogicalSize(renderer, display.w, display.h);
+        
         ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
     }
     else
     {
-        SDL_RenderSetScale(renderer, 1, 1);
-        blRenderer.setInternalContext({(x_resolution - y_resolution)/2, 0, y_resolution, y_resolution});
+        SDL_RenderSetLogicalSize(renderer, xResolution, yResolution);
+        blRenderer.applyResolution(xResolution, yResolution);
+        //SDL_SetWindowSize(window, xResolution, yResolution);
     }
 
     SDL_RenderPresent(renderer);
@@ -131,26 +129,37 @@ void BLApplication::init(bool test)
     window = SDL_CreateWindow("BLINKLITE", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, display.w, display.h, window_flags);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 
-    float baseDpi = 108.5f; // Adjust this base DPI to your needs
-    float ddpi, hdpi, vdpi;
-    SDL_GetDisplayDPI(0, &ddpi, &hdpi, &vdpi); // Assuming displayIndex 0 for simplicity
-    baseDpi = hdpi/2;
-    float scaleFactor = ddpi / baseDpi;
-    std::cout << scaleFactor << std::endl;
-    std::cout << ddpi << std::endl;
-    std::cout << hdpi << std::endl;
-    std::cout << vdpi << std::endl;
+
+
     if (window_flags & SDL_WINDOW_ALLOW_HIGHDPI)
     {
         std::cout << "HIGH DPI" << std::endl;
-        x_resolution = display.w*scaleFactor;
-        y_resolution = display.h*scaleFactor;
+        float ddpi, hdpi, vdpi;
+        SDL_GetDisplayDPI(0, &ddpi, &hdpi, &vdpi); // Assuming displayIndex 0 for simplicity
+        float baseDpi = 108.5f; // Adjust this base DPI to your needs
+        scaleFactor = ddpi / baseDpi;
     }
     else
     {
-        x_resolution = display.w;
-        y_resolution = display.h;
+        scaleFactor = 1;
     }
+
+    xResolution = display.w*scaleFactor;
+    yResolution = display.h*scaleFactor;
+
+    const std::vector<std::pair<int, int>> commonResolutions = {
+        {800, 600}, {1024, 768}, {1280, 720}, {1680, 945}, {1920, 1080}, {2048,1152}
+    };
+
+    for (const auto& res : commonResolutions) {
+        if (res.first < display.w && res.second < display.h) {
+            resolutions.push_back(res);
+        }
+    }
+
+    std::cout << "RESOLUTION: " << std::endl;
+    std::cout << xResolution << std::endl;
+    std::cout << yResolution << std::endl;
 
     if (renderer == nullptr)
     {
@@ -176,15 +185,16 @@ void BLApplication::init(bool test)
 
     isInit = true;
     blRenderer.sdlRenderer = renderer;
-    int xpos = (x_resolution - y_resolution)/2;
-    blRenderer.setInternalContext({xpos, 0, y_resolution, y_resolution});
-    blRenderer.setExternalContext({900,900});
     menu = new BlinkMenu();
+    menu->addResolutions(resolutions);
     if (test)
-        blRenderer.textureManager.addTexture(CreateTextureFromFile(renderer, "assets/test.png"));
-    //SDL_RenderSetLogicalSize(renderer, x_resolution, y_resolution);
-    //io_->DisplaySize = ImVec2({(float)x_resolution, (float)y_resolution}) / io_->DisplayFramebufferScale;
+        blRenderer.textureManager.addTexture(CreateTextureFromFile(renderer, "assets/sdlbackdrop.png"));
+    //SDL_RenderSetLogicalSize(renderer, xResolution, yResolution);
+    //io_->DisplaySize = ImVec2({(float)xResolution, (float)yResolution}) / io_->DisplayFramebufferScale;
     //ImGui::GetStyle().ScaleAllSizes(1.5);
+    blRenderer.frameLayout = {0.5, 0.5, 1, 1};
+    blRenderer.applyResolution(xResolution, yResolution);
+
 }
 
 void BLApplication::init(BlinkGame* blinkGame)
@@ -224,18 +234,42 @@ const SDL_Rect& BLApplication::currentDisplay()
     return BLApplication::instance()->display;
 }
 
-void BLApplication::changeDisplay(const ImVec2& dimensions)
+void BLApplication::changeWindow(const std::pair<int,int>& size)
 {
     auto& app = *BLApplication::instance();
-
-    float modx = dimensions.x/app.display.w;
-    float mody = dimensions.y/app.display.h;
-
-    app.display.h = dimensions.y;
-    app.display.w = dimensions.x;
-
-    auto inter = app.blRenderer.internals();
-    multiply_rect_x(inter, modx);
-    multiply_rect_y(inter, mody);
-    app.blRenderer.setInternalContext(inter);
+    SDL_SetWindowSize(app.window, size.first, size.second);
+    app.correctDisplay();
 }
+
+void BLApplication::correctDisplay()
+{
+    SDL_GetWindowSize(window,&display.w, &display.h);
+    if (display.h % 2)
+    {
+        display.h--;
+        SDL_SetWindowSize(window, display.w, display.h);
+    }
+
+    xResolution = display.w*scaleFactor;
+    yResolution = display.h*scaleFactor;
+}
+
+void BLApplication::toggleFullscreen() 
+{
+    auto& app = *BLApplication::instance();
+    Uint32 fullscreenFlag = SDL_WINDOW_FULLSCREEN;
+    Uint32 isFullscreen = SDL_GetWindowFlags(app.window) & fullscreenFlag;
+    SDL_SetWindowFullscreen(app.window, isFullscreen ? 0 : fullscreenFlag);
+    BLApplication::isFullscreen = !isFullscreen;
+    if (!BLApplication::isFullscreen)
+    {
+        BLApplication::changeWindow(app.resolutions[BLApplication::currentResolution]);
+    }
+    else
+    {
+        app.correctDisplay();
+    }
+}
+
+bool BLApplication::isFullscreen = true;
+int BLApplication::currentResolution = 0;

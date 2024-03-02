@@ -4,8 +4,9 @@
 #include "SDLUtil.hpp"
 
 
-BLSDLRenderer::BLSDLRenderer() : externalContext({1440, 900}), internalContext({0,0,1440,900})
+BLSDLRenderer::BLSDLRenderer()
 {
+    internalUnits = {2000, 2000};
     updateContext();
 }
 
@@ -14,22 +15,31 @@ BLSDLRenderer::BLSDLRenderer(SDL_Renderer* renderer) : BLSDLRenderer()
     sdlRenderer = renderer;
 }
 
-void BLSDLRenderer::setInternalContext(const SDL_Rect& internal)
+void BLSDLRenderer::applyResolution(int xResolution, int yResolution)
 {
-    internalContext = internal;
+    absoluteLayout.h = yResolution*frameLayout.ySize;
+    absoluteLayout.w = absoluteLayout.h*frameLayout.xyRatio;
+    absoluteLayout.y = -absoluteLayout.h/2+yResolution*frameLayout.y;
+    absoluteLayout.x = -absoluteLayout.w/2+xResolution*frameLayout.x;
     updateContext();
 }
 
-void BLSDLRenderer::setExternalContext(const SDL_Point& external)
+void BLSDLRenderer::setInternalUnits(const SDL_Point& units)
 {
-    externalContext = external;
+    internalUnits = units;
     updateContext();
+}
+
+void BLSDLRenderer::setFrameLayout(const FrameLayout& layout, int xResolution, int yResolution)
+{
+    frameLayout = layout;
+    applyResolution(xResolution, yResolution);
 }
 
 void BLSDLRenderer::updateContext()
 {
-    xScale = (float)internalContext.w/(float)externalContext.x;
-    yScale = (float)internalContext.h/(float)externalContext.y;
+    xScale = (float)absoluteLayout.w/(float)internalUnits.x;
+    yScale = (float)absoluteLayout.h/(float)internalUnits.y;
 }
 
 void BLSDLRenderer::render()
@@ -60,11 +70,11 @@ void BLSDLRenderer::renderInfo(const RenderInfo& info)
     SDL_Rect dest = info.dest;
     multiply_rect_x(dest, xScale);
     multiply_rect_y(dest, yScale);
-    dest.x += internalContext.x;
-    dest.y += internalContext.y;
+    dest.x += absoluteLayout.x;
+    dest.y += absoluteLayout.y;
 
-    dest.h = std::min(dest.h, internalContext.h);
-    dest.w = std::min(dest.w, internalContext.w);
+    //dest.h = std::min(dest.h, absoluteLayout.h);
+    //dest.w = std::min(dest.w, absoluteLayout.w);
 
     // Calculate the rotation center
     SDL_Point center = {dest.w / 2, dest.h / 2};
@@ -76,13 +86,4 @@ void BLSDLRenderer::renderInfo(const RenderInfo& info)
     }
     // Perform the actual rendering
     SDL_RenderCopyEx(sdlRenderer, texture, clip, &dest, info.rotation, &center, info.flip);
-}
-
-const SDL_Point& BLSDLRenderer::externals() const
-{
-    return externalContext;
-}
-const SDL_Rect& BLSDLRenderer::internals() const
-{
-    return internalContext;
 }

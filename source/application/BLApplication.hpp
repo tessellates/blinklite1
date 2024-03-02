@@ -2,6 +2,7 @@
 
 #include "Singleton.hpp"
 #include "BLSDLRenderer.hpp"
+
 #include <SDL.h>
 #include "imgui.h"
 
@@ -24,13 +25,19 @@ public:
     static BlinkGame* activeGame();
     static BLSDLRenderer& mainRenderer();
     static const SDL_Rect& currentDisplay();
-    static void changeDisplay(const ImVec2& dimensions);
+    static void changeWindow(const std::pair<int,int>& );
+
+    static bool isFullscreen;
+    static int currentResolution;
+    static void toggleFullscreen();
+    std::vector<std::pair<int,int>> resolutions;
 
 private:
     BLApplication();
     ~BLApplication();
 
     void loop();
+    void correctDisplay();
 
     SDL_Event event;
     SDL_Window* window = nullptr;
@@ -47,8 +54,10 @@ private:
     SDL_Texture* test;
     BLSDLRenderer blRenderer;
 
-    int x_resolution;
-    int y_resolution;
+    int xResolution;
+    int yResolution;
 
     SDL_Rect display;
+
+    float scaleFactor;
 };

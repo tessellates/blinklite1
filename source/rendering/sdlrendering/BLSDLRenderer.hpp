@@ -3,6 +3,7 @@
 #include "BLSDLRenderLayer.hpp"
 #include "RenderInfo.hpp"
 #include "BLSDLTextureManager.hpp"
+#include "FrameLayout.hpp"
 
 #include <SDL.h>
 #include <array>
@@ -19,22 +20,25 @@ public:
     void addRenderTarget(const RenderInfo& info);
     void renderInfo(const RenderInfo& info);
 
-    void setInternalContext(const SDL_Rect& context);
-    void setExternalContext(const SDL_Point& context);
+    void applyResolution(int xResolution, int yResolution);
+    void setInternalUnits(const SDL_Point&);
+    void setFrameLayout(const FrameLayout&, int, int);
 
-    const SDL_Point& externals() const;
-    const SDL_Rect& internals() const;
+    //const SDL_Rect& getAbsoluteLayout() const;
+    //const SDL_Point& getInternalUnits() const;
+    //const FrameLayout& getFrameLayout() const;
 
 public:
     std::array<BLSDLRenderLayer, 10> layers;
     SDL_Renderer* sdlRenderer;
     BLSDLTextureManager textureManager;
 
-private:
+public:
     void updateContext();
 
-    SDL_Rect internalContext;
-    SDL_Point externalContext;
+    FrameLayout frameLayout;
+    SDL_Rect absoluteLayout;
+    SDL_Point internalUnits;
 
     float xScale = 1;
     float yScale = 1;
