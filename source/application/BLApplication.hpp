@@ -19,9 +19,12 @@ public:
     int run();
     void init(bool test = true);
     void init(BlinkGame* blinkGame);
+    void updateDisplay();
 
     static BlinkGame* activeGame();
     static BLSDLRenderer& mainRenderer();
+    static const SDL_Rect& currentDisplay();
+    static void changeDisplay(const ImVec2& dimensions);
 
 private:
     BLApplication();
@@ -46,11 +49,6 @@ private:
 
     int x_resolution;
     int y_resolution;
-
-    float scaleFactor = 1;
-
-    int x_window;
-    int y_window;
 
     SDL_Rect display;
 };
