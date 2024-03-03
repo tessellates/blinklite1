@@ -47,6 +47,13 @@ void BLSDLRenderer::render()
     for (auto& layer : layers)
     {
         layer.render();
+    }
+}
+
+void BLSDLRenderer::clear()
+{
+    for (auto& layer : layers)
+    {
         layer.clear();
     }
 }

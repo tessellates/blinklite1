@@ -52,27 +52,29 @@ void BLApplication::loop()
         {
             if (event.key.keysym.sym == SDLK_ESCAPE) {
                 imguiToggle = !imguiToggle;
-                //io_->DisplaySize = ImVec2((float)450, (float)450);
             }
-            if (event.key.keysym.sym == SDLK_b)
+            else
             {
-                toggleFullscreen();
+                if (!imguiToggle && game != nullptr)   
+                    game->handleEvent(event);
             }
-            if (event.key.keysym.sym == SDLK_q)
-            {
-                //changeResolution(1200, 1200);
-            }
+        }
+        if (event.type == BL_RESOLUTIONCHANGE)
+        {
+            changeWindow();
         }
     }
 
     SDL_RenderClear(renderer);
 
-    if (game != nullptr)
+    if (game != nullptr && !imguiToggle)
     {
+        blRenderer.clear();
         game->run();
     }
     else
     {
+        blRenderer.clear();
         // Set up the destination rectangle
         SDL_Rect dest_rect {0, 0};
         dest_rect.w = blRenderer.internalUnits.x;
@@ -82,9 +84,10 @@ void BLApplication::loop()
         info.textureID = 0;
         info.layerID = 1;
         blRenderer.addRenderTarget(info);
-        blRenderer.render();
     }
-    SDL_SetRenderDrawColor(renderer, 50,0,0,255);
+    blRenderer.render();
+
+    SDL_SetRenderDrawColor(renderer, 0,0,0,255);
 
     // Start the Dear ImGui frame
     if (imguiToggle)
@@ -157,9 +160,10 @@ void BLApplication::init(bool test)
         }
     }
 
+/*
     std::cout << "RESOLUTION: " << std::endl;
     std::cout << xResolution << std::endl;
-    std::cout << yResolution << std::endl;
+    std::cout << yResolution << std::endl;*/
 
     if (renderer == nullptr)
     {
@@ -239,6 +243,12 @@ void BLApplication::changeWindow(const std::pair<int,int>& size)
     auto& app = *BLApplication::instance();
     SDL_SetWindowSize(app.window, size.first, size.second);
     app.correctDisplay();
+}
+
+void BLApplication::changeWindow()
+{
+    SDL_SetWindowSize(window, resolutions[BLApplication::currentResolution].first, resolutions[BLApplication::currentResolution].second);
+    correctDisplay();
 }
 
 void BLApplication::correctDisplay()

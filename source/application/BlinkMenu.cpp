@@ -49,7 +49,13 @@ void BlinkMenu::run()
                 bool isSelected = (BLApplication::currentResolution == i);
                 if (ImGui::Selectable(validResolutions[i].c_str(), isSelected)) {
                     BLApplication::currentResolution = i; // Update the current resolution on selection
-                    BLApplication::changeWindow(BLApplication::instance()->resolutions[BLApplication::currentResolution]);
+                    //BLApplication::instance()->changeWindow();
+                    //BLApplication::changeWindow(BLApplication::instance()->resolutions[BLApplication::currentResolution]);
+                    SDL_Event event;
+                    SDL_zero(event); // Initialize the event to zero
+                    event.type = BL_RESOLUTIONCHANGE;
+                    SDL_PushEvent(&event);
+
                 }
 
                 // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)

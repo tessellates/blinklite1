@@ -2,6 +2,7 @@
 
 #include "Singleton.hpp"
 #include "BLSDLRenderer.hpp"
+#include "SDLUserEvents.hpp"
 
 #include <SDL.h>
 #include "imgui.h"
@@ -26,6 +27,7 @@ public:
     static BLSDLRenderer& mainRenderer();
     static const SDL_Rect& currentDisplay();
     static void changeWindow(const std::pair<int,int>& );
+    void changeWindow();
 
     static bool isFullscreen;
     static int currentResolution;

@@ -17,6 +17,7 @@ public:
     BLSDLRenderer(SDL_Renderer* renderer);
 
     void render();
+    void clear();
     void addRenderTarget(const RenderInfo& info);
     void renderInfo(const RenderInfo& info);
 
