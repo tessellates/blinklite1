@@ -4,6 +4,9 @@
 #include <stddef.h>
 #include <SDL.h>
 
+class Node;
+class TextureInfo;
+
 struct RenderInfo
 {
     // Position and Size
@@ -20,12 +23,12 @@ struct RenderInfo
     // Additional Rendering Flags or Modifiers
     bool visible;
     SDL_RendererFlip flip;
-    float opacity;
+    //float opacity;
 
     SDL_Rect clip;
 
     RenderInfo() : dest({}), textureID(0), rotation(0),
-                   layerID(0), visible(true), flip(SDL_FLIP_NONE), opacity(1.0f), clip({}) {}
+                   layerID(0), visible(true), flip(SDL_FLIP_NONE), clip({}) {}
 };
 
 inline void printInfo(RenderInfo& info)
@@ -34,6 +37,7 @@ inline void printInfo(RenderInfo& info)
     std::cout << "rpt:" << info.rotation << std::endl;
     std::cout << "lid:" << info.layerID << std::endl;
     std::cout << "flip:" << info.flip << std::endl;
-    std::cout << "op:" << info.opacity << std::endl;
     std::cout << "vis:" << info.visible << std::endl;
 }
+
+RenderInfo createInfo(Node* node, TextureInfo* tinfo);

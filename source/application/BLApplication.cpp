@@ -160,6 +160,8 @@ void BLApplication::init(bool test)
         }
     }
 
+    BLApplication::currentResolution = resolutions.size() - 1;
+
 /*
     std::cout << "RESOLUTION: " << std::endl;
     std::cout << xResolution << std::endl;
