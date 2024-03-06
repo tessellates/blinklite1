@@ -9,5 +9,5 @@ struct TextureInfo
     float angle = 0;
     SDL_Rect dest {0,0,0,0};
     SDL_Rect clip {0,0,0,0};
-    int layerID;
+    int layerID = 0;
 };

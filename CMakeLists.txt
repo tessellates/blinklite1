@@ -32,6 +32,15 @@ if(BUILD_STAGING)
     add_subdirectory(staging) 
 endif()
 
+set(BLINKLIB ${PROJECT_NAME})
+
+# examples -- fully fletched out examples
+option(BUILD_EXAMPLES "Build examples" ON)
+if(BUILD_EXAMPLES)
+    add_subdirectory(examples) 
+endif()
+
+
 # testing
 option(BUILD_TESTS "Build tests" OFF)
 

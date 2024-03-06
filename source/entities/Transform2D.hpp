@@ -6,7 +6,7 @@
 #include <cmath> // For cosf() and sinf()
 
 // Rotate this vector by a given angle (in degrees)
-Vec2 rotate(const Vec2& vec, float angleDegrees)
+inline Vec2 rotate(const Vec2& vec, float angleDegrees)
 {
     float angleRadians = angleDegrees * (M_PI / 180.0f);
     float cosAngle = cosf(angleRadians);

@@ -3,6 +3,7 @@
 #include "Singleton.hpp"
 #include "BLSDLRenderer.hpp"
 #include "SDLUserEvents.hpp"
+#include "GameClock.hpp"
 
 #include <SDL.h>
 #include "imgui.h"
@@ -31,7 +32,8 @@ public:
 
     static bool isFullscreen;
     static int currentResolution;
-    static void toggleFullscreen();
+    static float deltaTime;
+    void toggleFullscreen();
     std::vector<std::pair<int,int>> resolutions;
 
 private:
@@ -62,4 +64,6 @@ private:
     SDL_Rect display;
 
     float scaleFactor;
+
+    GameClock clock;
 };

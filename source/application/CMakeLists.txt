@@ -10,4 +10,5 @@ target_sources(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/BLApplication.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/BlinkGame.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/BlinkMenu.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/GameClock.cpp
 )

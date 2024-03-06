@@ -39,6 +39,8 @@ int BLApplication::run()
 
 void BLApplication::loop()
 {
+    SDL_SetRenderDrawColor(renderer, 0,0,0,255);
+
     //SDL_RenderSetLogicalSize(renderer, xResolution, yResolution);
 
     while (SDL_PollEvent(&event))
@@ -53,20 +55,22 @@ void BLApplication::loop()
             if (event.key.keysym.sym == SDLK_ESCAPE) {
                 imguiToggle = !imguiToggle;
             }
-            else
-            {
-                if (!imguiToggle && game != nullptr)   
-                    game->handleEvent(event);
-            }
         }
         if (event.type == BL_RESOLUTIONCHANGE)
         {
             changeWindow();
         }
+        if (event.type == BL_FULLSCREEN_TOGGLE)
+        {
+            toggleFullscreen();
+        }
+        if (!imguiToggle && game != nullptr)   
+            game->handleEvent(event);
     }
 
     SDL_RenderClear(renderer);
-
+    clock.update();
+    BLApplication::deltaTime = clock.getDeltaTime();
     if (game != nullptr && !imguiToggle)
     {
         blRenderer.clear();
@@ -74,6 +78,7 @@ void BLApplication::loop()
     }
     else
     {
+        /*
         blRenderer.clear();
         // Set up the destination rectangle
         SDL_Rect dest_rect {0, 0};
@@ -83,7 +88,7 @@ void BLApplication::loop()
         info.dest = dest_rect;
         info.textureID = 0;
         info.layerID = 1;
-        blRenderer.addRenderTarget(info);
+        blRenderer.addRenderTarget(info);*/
     }
     blRenderer.render();
 
@@ -201,6 +206,11 @@ void BLApplication::init(bool test)
     blRenderer.frameLayout = {0.5, 0.5, 1, 1};
     blRenderer.applyResolution(xResolution, yResolution);
 
+    std::cout << "STATS FOR CATS" << std::endl;
+    std::cout << "xres:" << xResolution << std::endl;
+    std::cout << "yres:" << yResolution <<std::endl;
+    std::cout << "disx:" << display.w << std::endl;
+    std::cout << "disy:" << display.h << std::endl;
 }
 
 void BLApplication::init(BlinkGame* blinkGame)
@@ -210,6 +220,7 @@ void BLApplication::init(BlinkGame* blinkGame)
         init();
     }
     game = blinkGame;
+    game->init();
 }
 
 //BLApplication::BLApplication() {}
@@ -268,20 +279,20 @@ void BLApplication::correctDisplay()
 
 void BLApplication::toggleFullscreen() 
 {
-    auto& app = *BLApplication::instance();
     Uint32 fullscreenFlag = SDL_WINDOW_FULLSCREEN;
-    Uint32 isFullscreen = SDL_GetWindowFlags(app.window) & fullscreenFlag;
-    SDL_SetWindowFullscreen(app.window, isFullscreen ? 0 : fullscreenFlag);
+    Uint32 isFullscreen = SDL_GetWindowFlags(window) & fullscreenFlag;
+    SDL_SetWindowFullscreen(window, isFullscreen ? 0 : fullscreenFlag);
     BLApplication::isFullscreen = !isFullscreen;
     if (!BLApplication::isFullscreen)
     {
-        BLApplication::changeWindow(app.resolutions[BLApplication::currentResolution]);
+        BLApplication::changeWindow(resolutions[BLApplication::currentResolution]);
     }
     else
     {
-        app.correctDisplay();
+        correctDisplay();
     }
 }
 
 bool BLApplication::isFullscreen = true;
 int BLApplication::currentResolution = 0;
+float BLApplication::deltaTime = 0;

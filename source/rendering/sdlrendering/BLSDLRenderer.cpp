@@ -2,11 +2,12 @@
 
 #include "BLSDLRenderer.hpp"
 #include "SDLUtil.hpp"
+#include "SDLPrints.hpp"
 
 
 BLSDLRenderer::BLSDLRenderer()
 {
-    internalUnits = {2000, 2000};
+    internalUnits = {1152, 1152};
     updateContext();
 }
 
@@ -60,7 +61,7 @@ void BLSDLRenderer::clear()
 
 void BLSDLRenderer::addRenderTarget(const RenderInfo& info)
 {
-    layers[info.layerID].addToLayer([this, &info]() {this->renderInfo(info);});
+    layers[info.layerID].addToLayer([this, info]() {this->renderInfo(info);});
 }
 
 void BLSDLRenderer::renderInfo(const RenderInfo& info)
@@ -79,7 +80,6 @@ void BLSDLRenderer::renderInfo(const RenderInfo& info)
     multiply_rect_y(dest, yScale);
     dest.x += absoluteLayout.x;
     dest.y += absoluteLayout.y;
-
     //dest.h = std::min(dest.h, absoluteLayout.h);
     //dest.w = std::min(dest.w, absoluteLayout.w);
 
@@ -93,4 +93,18 @@ void BLSDLRenderer::renderInfo(const RenderInfo& info)
     }
     // Perform the actual rendering
     SDL_RenderCopyEx(sdlRenderer, texture, clip, &dest, info.rotation, &center, info.flip);
+}
+
+SDL_Point BLSDLRenderer::pointInUnits(const SDL_Point& point)
+{
+    if (SDL_PointInRect(&point, &absoluteLayout)) 
+    {
+        int x = (point.x - absoluteLayout.x)/xScale;
+        int y = (point.y - absoluteLayout.y)/yScale;
+        return {x,y};
+    }
+    else
+    {
+        return {-1, -1};
+    }
 }

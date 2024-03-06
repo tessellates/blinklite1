@@ -25,6 +25,8 @@ public:
     void setInternalUnits(const SDL_Point&);
     void setFrameLayout(const FrameLayout&, int, int);
 
+    SDL_Point pointInUnits(const SDL_Point& point);
+
     //const SDL_Rect& getAbsoluteLayout() const;
     //const SDL_Point& getInternalUnits() const;
     //const FrameLayout& getFrameLayout() const;

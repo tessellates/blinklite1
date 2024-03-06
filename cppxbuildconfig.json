@@ -9,6 +9,11 @@
             "name": "blinklite",
             "path": ".",
             "exe": "staging/main"
+        },
+        {
+            "name": "connect4",
+            "path": ".",
+            "exe": "examples/connect4/connect4"
         }
     ],
     "cmake_actions": [],

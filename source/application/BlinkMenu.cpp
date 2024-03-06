@@ -37,8 +37,10 @@ void BlinkMenu::run()
 
     // Fullscreen toggle
     if (ImGui::Checkbox("Fullscreen", &BLApplication::isFullscreen)) {
-        // The checkbox was interacted with; its state has changed.
-        BLApplication::toggleFullscreen(); // Call a static method to actually change the fullscreen state of the application.
+        SDL_Event event;
+        SDL_zero(event); // Initialize the event to zero
+        event.type = BL_FULLSCREEN_TOGGLE;
+        SDL_PushEvent(&event);
     }
 
     static int currentResolution = 0; // Variable to store the current selection, change it as per your needs or application state
