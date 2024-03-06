@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL.h>
+#include "BLDefs.hpp"
 
 struct TextureInfo
 {
