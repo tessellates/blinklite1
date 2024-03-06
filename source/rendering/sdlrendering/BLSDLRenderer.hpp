@@ -19,7 +19,7 @@ public:
     void render();
     void clear();
     void addRenderTarget(const RenderInfo& info);
-    void renderInfo(const RenderInfo& info);
+    void renderInfo(const RenderInfo& info, bool debug = false);
 
     void applyResolution(int xResolution, int yResolution);
     void setInternalUnits(const SDL_Point&);

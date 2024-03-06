@@ -6,9 +6,9 @@
 void ConnectGame::init()
 {
     gameRenderer = &BLApplication::mainRenderer();
-    int gridU = 2000;
-    gameRenderer->setInternalUnits({gridU, gridU});
-    grid = Grid({gridU/72, gridU/12, (int)((70.0/72.0)*gridU), (int)((60.0/72.0)*gridU)}, 7, 6);
+    //int gridU = 72;
+    gameRenderer->setInternalUnits({72, 72});
+    grid = Grid({1,6,70,60}, 7, 6);
     connectGui.init(grid);
     connectGui.gameRenderer = gameRenderer;
     connectModel = ConnectModel();

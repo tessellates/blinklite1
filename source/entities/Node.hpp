@@ -19,4 +19,5 @@ public:
     void removeChild(Node* child);
     void updatePosition();
     void setRelative(const Transform2D& relative);
+    //void update
 };

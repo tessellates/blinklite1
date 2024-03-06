@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stddef.h>
 #include <SDL.h>
+#include "BLDefs.hpp"
 
 class Node;
 class TextureInfo;
@@ -10,7 +11,7 @@ class TextureInfo;
 struct RenderInfo
 {
     // Position and Size
-    SDL_Rect dest;
+    Rect dest;
 
     int textureID; // Use an appropriate type for your texture identifiers
 
@@ -27,7 +28,7 @@ struct RenderInfo
 
     SDL_Rect clip;
 
-    RenderInfo() : dest({}), textureID(0), rotation(0),
+    RenderInfo() : dest({0,0,0,0}), textureID(0), rotation(0),
                    layerID(0), visible(true), flip(SDL_FLIP_NONE), clip({}) {}
 };
 
@@ -41,3 +42,4 @@ inline void printInfo(RenderInfo& info)
 }
 
 RenderInfo createInfo(Node* node, TextureInfo* tinfo);
+RenderInfo createInfo(const Node& node, const TextureInfo& tinfo);

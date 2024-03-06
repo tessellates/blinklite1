@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Coordinate.hpp"
+#include "BLDefs.hpp"
 
 struct Grid
 {
@@ -15,8 +16,8 @@ struct Grid
     Grid() = default;
     Grid(const SDL_Rect& rect, int nx, int ny) : rect(rect), nx(nx), ny(ny)
     {
-        xsize = rect.w/nx;
-        ysize = rect.h/ny;
+        xsize = (float)(rect.w)/nx;
+        ysize = (float)(rect.h)/ny;
     }
 /*
     Grid(const SDL_Rect& rect, float xsize, float ysize ) : rect(rect), xsize(xsize), ysize(ysize)

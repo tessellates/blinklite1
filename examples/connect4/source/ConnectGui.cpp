@@ -24,7 +24,7 @@ void ConnectGui::addConnectEntity(const Coordinate& position, int color)
     node.relative.position = grid.point(position);
     node.updatePosition();
     TextureInfo info;
-    info.dest = {0, 0, (int)grid.xsize, (int)grid.ysize};
+    info.dest = {0, 0, grid.xsize, grid.ysize};
     info.textureID = textureID;
 
     nodes.insert({position, {node, info}});
@@ -44,7 +44,7 @@ void ConnectGui::render()
 {    
     for (auto& render : nodes)
     {
-        auto x = createInfo(&render.second.first, &render.second.second);
+        auto x = createInfo(render.second.first, render.second.second);
         gameRenderer->addRenderTarget(x);
     }
 }

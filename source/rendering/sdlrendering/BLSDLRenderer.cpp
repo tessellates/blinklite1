@@ -64,7 +64,7 @@ void BLSDLRenderer::addRenderTarget(const RenderInfo& info)
     layers[info.layerID].addToLayer([this, info]() {this->renderInfo(info);});
 }
 
-void BLSDLRenderer::renderInfo(const RenderInfo& info)
+void BLSDLRenderer::renderInfo(const RenderInfo& info, bool debug)
 {
     if (!info.visible) return; // Skip rendering if not visible
 
@@ -75,11 +75,23 @@ void BLSDLRenderer::renderInfo(const RenderInfo& info)
         return;
     }
 
-    SDL_Rect dest = info.dest;
-    multiply_rect_x(dest, xScale);
-    multiply_rect_y(dest, yScale);
+    auto destf = info.dest;
+    multiply_rect_x(destf, xScale);
+    multiply_rect_y(destf, yScale);
+    auto dest = cast_rect_smart(destf);
     dest.x += absoluteLayout.x;
     dest.y += absoluteLayout.y;
+    if (debug)
+    {
+        std::cout << "-------------" << destf.x << std::endl;
+        std::cout << "float:" << std::endl;
+        std::cout << "x:" << destf.x << std::endl;
+        std::cout << "y:" << destf.y << std::endl;
+        std::cout << "w:" << destf.z << std::endl;
+        std::cout << "h:" << destf.w << std::endl;
+        std::cout << "int:" << std::endl;
+        print(dest);
+    }
     //dest.h = std::min(dest.h, absoluteLayout.h);
     //dest.w = std::min(dest.w, absoluteLayout.w);
 
@@ -92,7 +104,8 @@ void BLSDLRenderer::renderInfo(const RenderInfo& info)
         clip = nullptr;
     }
     // Perform the actual rendering
-    SDL_RenderCopyEx(sdlRenderer, texture, clip, &dest, info.rotation, &center, info.flip);
+    //SDL_RenderCopyEx(sdlRenderer, texture, clip, &dest, info.rotation, &center, info.flip);
+    SDL_RenderCopy(sdlRenderer, texture, clip, &dest);
 }
 
 SDL_Point BLSDLRenderer::pointInUnits(const SDL_Point& point)

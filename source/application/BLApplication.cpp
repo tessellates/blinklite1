@@ -145,7 +145,7 @@ void BLApplication::init(bool test)
         float ddpi, hdpi, vdpi;
         SDL_GetDisplayDPI(0, &ddpi, &hdpi, &vdpi); // Assuming displayIndex 0 for simplicity
         float baseDpi = 108.5f; // Adjust this base DPI to your needs
-        scaleFactor = ddpi / baseDpi;
+        scaleFactor = 2;//ddpi / baseDpi;
     }
     else
     {
@@ -279,7 +279,7 @@ void BLApplication::correctDisplay()
 
 void BLApplication::toggleFullscreen() 
 {
-    Uint32 fullscreenFlag = SDL_WINDOW_FULLSCREEN;
+    Uint32 fullscreenFlag = SDL_WINDOW_FULLSCREEN_DESKTOP;
     Uint32 isFullscreen = SDL_GetWindowFlags(window) & fullscreenFlag;
     SDL_SetWindowFullscreen(window, isFullscreen ? 0 : fullscreenFlag);
     BLApplication::isFullscreen = !isFullscreen;
