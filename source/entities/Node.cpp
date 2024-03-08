@@ -36,3 +36,24 @@ void Node::setRelative(const Transform2D& relativet)
     relative = relativet;
     this->isDirty = true;
 }
+
+void Node::addUpdateMethod(const UpdateMethod& method)
+{
+    updateMethods.push_back(method);
+}
+
+bool Node::update()
+{
+    bool updated = false;
+    for (auto& method : updateMethods)
+    {
+        if (method(*this)) 
+        {
+            updated = true;
+        }
+    }
+    if (updated)
+        isDirty = true;
+
+    return updated;
+}

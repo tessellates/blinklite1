@@ -25,7 +25,7 @@ public:
     void setInternalUnits(const SDL_Point&);
     void setFrameLayout(const FrameLayout&, int, int);
 
-    SDL_Point pointInUnits(const SDL_Point& point);
+    Vec2 pointInUnits(const SDL_Point& point);
 
     //const SDL_Rect& getAbsoluteLayout() const;
     //const SDL_Point& getInternalUnits() const;
@@ -33,9 +33,9 @@ public:
 
 public:
     std::array<BLSDLRenderLayer, 10> layers;
-    SDL_Renderer* sdlRenderer;
+    SDL_Renderer* renderer;
     BLSDLTextureManager textureManager;
-
+    SDL_Color backgroundColor = {222, 235, 212, 255};
 public:
     void updateContext();
 

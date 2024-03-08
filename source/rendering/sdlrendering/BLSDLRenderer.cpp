@@ -13,7 +13,7 @@ BLSDLRenderer::BLSDLRenderer()
 
 BLSDLRenderer::BLSDLRenderer(SDL_Renderer* renderer) : BLSDLRenderer()
 {
-    sdlRenderer = renderer;
+    renderer = renderer;
 }
 
 void BLSDLRenderer::applyResolution(int xResolution, int yResolution)
@@ -45,6 +45,8 @@ void BLSDLRenderer::updateContext()
 
 void BLSDLRenderer::render()
 {
+    SDL_SetRenderDrawColor(renderer, backgroundColor.r, backgroundColor.b, backgroundColor.g, backgroundColor.a); // Color #deebd4
+    SDL_RenderFillRect(renderer, &absoluteLayout);
     for (auto& layer : layers)
     {
         layer.render();
@@ -96,7 +98,7 @@ void BLSDLRenderer::renderInfo(const RenderInfo& info, bool debug)
     //dest.w = std::min(dest.w, absoluteLayout.w);
 
     // Calculate the rotation center
-    SDL_Point center = {dest.w / 2, dest.h / 2};
+    SDL_Point center = {dest.h / 2, dest.h / 2};
 
     const SDL_Rect* clip = &info.clip;
     if (info.clip.h == 0 || info.clip.w == 0)
@@ -104,16 +106,16 @@ void BLSDLRenderer::renderInfo(const RenderInfo& info, bool debug)
         clip = nullptr;
     }
     // Perform the actual rendering
-    //SDL_RenderCopyEx(sdlRenderer, texture, clip, &dest, info.rotation, &center, info.flip);
-    SDL_RenderCopy(sdlRenderer, texture, clip, &dest);
+    SDL_RenderCopyEx(renderer, texture, clip, &dest, info.rotation, &center, info.flip);
+    //DL_RenderCopy(renderer, texture, clip, &dest);
 }
 
-SDL_Point BLSDLRenderer::pointInUnits(const SDL_Point& point)
+Vec2 BLSDLRenderer::pointInUnits(const SDL_Point& point)
 {
     if (SDL_PointInRect(&point, &absoluteLayout)) 
     {
-        int x = (point.x - absoluteLayout.x)/xScale;
-        int y = (point.y - absoluteLayout.y)/yScale;
+        float x = float(point.x - absoluteLayout.x)/xScale;
+        float y = float(point.y - absoluteLayout.y)/yScale;
         return {x,y};
     }
     else

@@ -69,6 +69,9 @@ void BlinkMenu::run()
         }        
     }
 
+    // Fullscreen toggle
+    if (ImGui::Checkbox("Framerate", &BLApplication::frameRate)) {
+    }
     /*
     // V-Sync toggle
     static bool isVsyncEnabled = false;

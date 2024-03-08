@@ -54,10 +54,10 @@ if(BUILD_TESTS)
 endif()
 
 # Link SDL to the library
-target_link_libraries(${PROJECT_NAME} PUBLIC SDL2::SDL2main SDL2::SDL2 SDL2_image::SDL2_image)
+target_link_libraries(${PROJECT_NAME} PUBLIC SDL2::SDL2main SDL2::SDL2 SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf)
 
 # Enable imgui default math operator
 add_compile_definitions(IMGUI_DEFINE_MATH_OPERATORS)
 
 # Copy assets to the build directory
-#file(COPY assets/ DESTINATION ${CMAKE_BINARY_DIR}/assets)
+file(COPY assets/ DESTINATION ${CMAKE_BINARY_DIR}/assets)

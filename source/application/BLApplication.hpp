@@ -4,6 +4,7 @@
 #include "BLSDLRenderer.hpp"
 #include "SDLUserEvents.hpp"
 #include "GameClock.hpp"
+#include "FrameRateCounter.hpp"
 
 #include <SDL.h>
 #include "imgui.h"
@@ -33,6 +34,7 @@ public:
     static bool isFullscreen;
     static int currentResolution;
     static float deltaTime;
+    static bool frameRate;
     void toggleFullscreen();
     std::vector<std::pair<int,int>> resolutions;
 
@@ -66,4 +68,6 @@ private:
     float scaleFactor;
 
     GameClock clock;
+
+    FrameRateCounter frc;
 };

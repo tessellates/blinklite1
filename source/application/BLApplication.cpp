@@ -20,6 +20,12 @@ BLApplication::BLApplication()
     if (!(IMG_Init(imgFlags) & imgFlags)) {
         // Handle error
     }
+
+    // Initialize SDL_ttf
+    if (TTF_Init() == -1) {
+        std::cerr << "SDL_ttf initialization failed: " << TTF_GetError() << std::endl;
+        SDL_Quit(); // Clean up SDL before exiting
+    }
     // From 2.0.18: Enable native IME.
     #ifdef SDL_HINT_IME_SHOW_UI
     SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
@@ -121,7 +127,9 @@ void BLApplication::loop()
         blRenderer.applyResolution(xResolution, yResolution);
         //SDL_SetWindowSize(window, xResolution, yResolution);
     }
-
+    frc.update();
+    if (BLApplication::frameRate)
+        frc.render();
     SDL_RenderPresent(renderer);
 }
 
@@ -195,7 +203,7 @@ void BLApplication::init(bool test)
     //ImGui::GetStyle().ScaleAllSizes(4);
 
     isInit = true;
-    blRenderer.sdlRenderer = renderer;
+    blRenderer.renderer = renderer;
     menu = new BlinkMenu();
     menu->addResolutions(resolutions);
     if (test)
@@ -211,6 +219,13 @@ void BLApplication::init(bool test)
     std::cout << "yres:" << yResolution <<std::endl;
     std::cout << "disx:" << display.w << std::endl;
     std::cout << "disy:" << display.h << std::endl;
+
+    TTF_Font* font = TTF_OpenFont("assets/Arial.ttf", 24);
+    if (!font) {
+        std::cerr << "Failed to load font: " << TTF_GetError() << std::endl;
+        // Handle error
+    }
+    frc = FrameRateCounter(renderer, font);
 }
 
 void BLApplication::init(BlinkGame* blinkGame)
@@ -221,6 +236,15 @@ void BLApplication::init(BlinkGame* blinkGame)
     }
     game = blinkGame;
     game->init();
+    menu->addResolutions(game->resolutions);
+
+    resolutions.clear();
+    for (const auto& res : game->resolutions) {
+        if (res.first < display.w && res.second < display.h) {
+            resolutions.push_back(res);
+        }
+    }
+    BLApplication::currentResolution = resolutions.size() - 1;
 }
 
 //BLApplication::BLApplication() {}
@@ -294,5 +318,6 @@ void BLApplication::toggleFullscreen()
 }
 
 bool BLApplication::isFullscreen = true;
+bool BLApplication::frameRate = true;
 int BLApplication::currentResolution = 0;
 float BLApplication::deltaTime = 0;

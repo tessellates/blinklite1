@@ -32,4 +32,10 @@ public:
     Grid grid;
 
     BLSDLRenderer* gameRenderer;
+    RenderInfo background;
+    RenderInfo foreground;
+    RenderInfo top;
+    RenderInfo bot;
+    RenderInfo side1;
+    RenderInfo side2;
 };

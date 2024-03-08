@@ -1,14 +1,16 @@
 
 #include "ConnectGame.hpp"
 #include "BLApplication.hpp"
-#include "CreateTexture.hpp"
+#include "TextureUtility.hpp"
+#include "MovementComponent.hpp"
 
 void ConnectGame::init()
 {
+    resolutions = {{720, 720}, {1080,1080}};
     gameRenderer = &BLApplication::mainRenderer();
     //int gridU = 72;
     gameRenderer->setInternalUnits({72, 72});
-    grid = Grid({1,6,70,60}, 7, 6);
+    grid = Grid({4.5,9,63,54}, 7, 6);
     connectGui.init(grid);
     connectGui.gameRenderer = gameRenderer;
     connectModel = ConnectModel();
@@ -16,12 +18,39 @@ void ConnectGame::init()
     connectModel.removeConnectEntity.push_back([&](const Coordinate& p) {this->connectGui.removeConnectEntity(p);});
     connectModel.changeConnectEntity.push_back([&](const Coordinate& p, int c) {this->connectGui.changeConnectEntity(p, c);});
 
-    gameRenderer->textureManager.addTexture(CreateColorTexture(gameRenderer->sdlRenderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 255, 0, 0, 255)));
-    gameRenderer->textureManager.addTexture(CreateColorTexture(gameRenderer->sdlRenderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 0, 255, 0, 255)));
-    gameRenderer->textureManager.addTexture(CreateColorTexture(gameRenderer->sdlRenderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 255, 255, 0, 255)));
-    gameRenderer->textureManager.addTexture(CreateColorTexture(gameRenderer->sdlRenderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 255, 0, 0, 80)));
-    gameRenderer->textureManager.addTexture(CreateColorTexture(gameRenderer->sdlRenderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 0, 255, 0, 80)));
-    gameRenderer->textureManager.addTexture(CreateColorTexture(gameRenderer->sdlRenderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 255, 255, 0, 80)));
+    gameRenderer->textureManager.addTexture(CreateTextureFromFile(gameRenderer->renderer, "assets/rcoin.png"));
+    gameRenderer->textureManager.addTexture(CreateTextureFromFile(gameRenderer->renderer, "assets/gcoin.png"));
+    gameRenderer->textureManager.addTexture(CreateColorTexture(gameRenderer->renderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 255, 255, 0, 180)));
+    gameRenderer->textureManager.addTexture(CreateColorTexture(gameRenderer->renderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 255, 0, 0, 80)));
+    gameRenderer->textureManager.addTexture(CreateColorTexture(gameRenderer->renderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 0, 255, 0, 80)));
+    gameRenderer->textureManager.addTexture(CreateColorTexture(gameRenderer->renderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 255, 255, 50, 180)));
+    SDL_Texture* tile = CreateTextureFromFile(gameRenderer->renderer, "assets/node.png");
+    SDL_Texture* tile2 = CreateTextureFromFile(gameRenderer->renderer, "assets/nodef.png");
+    gameRenderer->textureManager.addTexture(CreateGridTexture(gameRenderer->renderer, tile, 7, 6));
+    gameRenderer->textureManager.addTexture(CreateTextureFromFile(gameRenderer->renderer, "assets/TOP.png"));
+    gameRenderer->textureManager.addTexture(CreateGridTexture(gameRenderer->renderer, tile2, 7, 6));
+    background.dest = {4.5,9,63,54};
+    background.layerID = 0;
+    background.textureID = 7;
+    foreground = background;
+    foreground.layerID = 3;
+    foreground.textureID = 9;
+    top.dest = {4.5,4,63,5};
+    top.layerID = 2;
+    top.textureID = 8;
+    bot.dest = {4.5,63,63,5};
+    bot.layerID = 2;
+    bot.textureID = 8;
+    bot.flip = SDL_FLIP_VERTICAL;
+
+    side1.dest = {67.5,5,62,2};
+    side1.layerID = 2;
+    side1.textureID = 8;
+    side1.rotation = 90;
+    side2 = side1;
+    side2.rotation = 90;
+    side2.dest = {2.5,5,62,2};
+    side2.flip = SDL_FLIP_VERTICAL;
 }
 
 void ConnectGame::handleEvent(const SDL_Event& event)
@@ -34,12 +63,13 @@ void ConnectGame::handleEvent(const SDL_Event& event)
             auto point = gameRenderer->pointInUnits({mouseX, mouseY});
             if (point.x >= 0)
             {
-                if (SDL_PointInRect(&point, &grid.rect))
+                if (pointInRect(point, grid.rect))
                 {
                     hover(grid.coordinate(point));
                     return;
                 }
             }
+            currentPreview = -1;
             connectModel.resetCycle();
             break;
         }
@@ -51,9 +81,10 @@ void ConnectGame::handleEvent(const SDL_Event& event)
                 auto point = gameRenderer->pointInUnits({mouseX, mouseY});
                 if (point.x >= 0)
                 {
-                    if (SDL_PointInRect(&point, &grid.rect))
+                    if (pointInRect(point, grid.rect))
                     {
                         clicked(grid.coordinate(point));
+                        hover(grid.coordinate(point));
                     }
                 }
             }
@@ -96,16 +127,26 @@ void ConnectGame::hover(const Coordinate& position)
 
 void ConnectGame::run()
 {
+    gameRenderer->addRenderTarget(background);
+    gameRenderer->addRenderTarget(top);
+    gameRenderer->addRenderTarget(bot);
+    gameRenderer->addRenderTarget(side1);
+    gameRenderer->addRenderTarget(side2);
+    gameRenderer->addRenderTarget(foreground);
     connectGui.render();
 }
 
 void ConnectGame::forward()
 {
     connectModel.forward();
+    connectModel.resetCycle();
+    currentPreview = -1;
 }
 
 void ConnectGame::backward()
 {
     connectModel.backward();
+    connectModel.resetCycle();
+    currentPreview = -1;
 }
    
