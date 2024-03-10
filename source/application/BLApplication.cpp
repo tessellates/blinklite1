@@ -47,8 +47,6 @@ void BLApplication::loop()
 {
     SDL_SetRenderDrawColor(renderer, 0,0,0,255);
 
-    //SDL_RenderSetLogicalSize(renderer, xResolution, yResolution);
-
     while (SDL_PollEvent(&event))
     {
         ImGui_ImplSDL2_ProcessEvent(&event);
@@ -60,6 +58,9 @@ void BLApplication::loop()
         {
             if (event.key.keysym.sym == SDLK_ESCAPE) {
                 imguiToggle = !imguiToggle;
+            }
+            if (event.key.keysym.sym == SDLK_t) {
+                blRenderer.toggleTextureLayerMode(!blRenderer.textureLayerMode);
             }
         }
         if (event.type == BL_RESOLUTIONCHANGE)
@@ -82,7 +83,7 @@ void BLApplication::loop()
         blRenderer.clear();
         game->run();
     }
-    else
+    if (game == nullptr)
     {
         /*
         blRenderer.clear();
@@ -113,8 +114,6 @@ void BLApplication::loop()
         menu->applyResolution(display.w, display.h);
         
         ImGui::NewFrame();
-        //SDL_RenderSetScale(renderer, io_->DisplayFramebufferScale.x, io_->DisplayFramebufferScale.y);
-        //SDL_SetWindowSize(window, xResolution/io_->DisplayFramebufferScale.x, yResolution/io_->DisplayFramebufferScale.x);
         menu->run();
         ImGui::Render();
         SDL_RenderSetLogicalSize(renderer, display.w, display.h);
@@ -125,7 +124,6 @@ void BLApplication::loop()
     {
         SDL_RenderSetLogicalSize(renderer, xResolution, yResolution);
         blRenderer.applyResolution(xResolution, yResolution);
-        //SDL_SetWindowSize(window, xResolution, yResolution);
     }
     frc.update();
     if (BLApplication::frameRate)
@@ -172,13 +170,7 @@ void BLApplication::init(bool test)
             resolutions.push_back(res);
         }
     }
-
     BLApplication::currentResolution = resolutions.size() - 1;
-
-/*
-    std::cout << "RESOLUTION: " << std::endl;
-    std::cout << xResolution << std::endl;
-    std::cout << yResolution << std::endl;*/
 
     if (renderer == nullptr)
     {
@@ -208,9 +200,7 @@ void BLApplication::init(bool test)
     menu->addResolutions(resolutions);
     if (test)
         blRenderer.textureManager.addTexture(CreateTextureFromFile(renderer, "assets/sdlbackdrop.png"));
-    //SDL_RenderSetLogicalSize(renderer, xResolution, yResolution);
-    //io_->DisplaySize = ImVec2({(float)xResolution, (float)yResolution}) / io_->DisplayFramebufferScale;
-    //ImGui::GetStyle().ScaleAllSizes(1.5);
+
     blRenderer.frameLayout = {0.5, 0.5, 1, 1};
     blRenderer.applyResolution(xResolution, yResolution);
 

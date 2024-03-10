@@ -6,10 +6,12 @@
 
 void ConnectGame::init()
 {
-    resolutions = {{720, 720}, {1080,1080}};
+    resolutions = {{360,360}, {720, 720}, {1080,1080}};
     gameRenderer = &BLApplication::mainRenderer();
     //int gridU = 72;
     gameRenderer->setInternalUnits({72, 72});
+    gameRenderer->toggleTextureLayerMode(true);
+
     grid = Grid({4.5,9,63,54}, 7, 6);
     connectGui.init(grid);
     connectGui.gameRenderer = gameRenderer;
@@ -58,33 +60,23 @@ void ConnectGame::handleEvent(const SDL_Event& event)
     switch (event.type) 
     {
         case SDL_MOUSEMOTION: {
-            int mouseX = event.button.x;
-            int mouseY = event.button.y;
-            auto point = gameRenderer->pointInUnits({mouseX, mouseY});
-            if (point.x >= 0)
-            {
-                if (pointInRect(point, grid.rect))
-                {
-                    hover(grid.coordinate(point));
-                    return;
-                }
-            }
-            currentPreview = -1;
-            connectModel.resetCycle();
+            int mouseX = event.motion.x;
+            int mouseY = event.motion.y;
+            hover(mouseX, mouseY);
             break;
         }
         case SDL_MOUSEBUTTONDOWN: {
             if (event.button.button == SDL_BUTTON_LEFT) 
             {
-                int mouseX = event.motion.x;
-                int mouseY = event.motion.y;
+                int mouseX = event.button.x;
+                int mouseY = event.button.y;
                 auto point = gameRenderer->pointInUnits({mouseX, mouseY});
                 if (point.x >= 0)
                 {
                     if (pointInRect(point, grid.rect))
                     {
                         clicked(grid.coordinate(point));
-                        hover(grid.coordinate(point));
+                        hover(mouseX, mouseY);
                     }
                 }
             }
@@ -113,16 +105,27 @@ void ConnectGame::clicked(const Coordinate& position)
     play = true;
 }
 
-void ConnectGame::hover(const Coordinate& position)
+void ConnectGame::hover(int mouseX, int mouseY)
 {
-    if (currentPreview != position.x)
+    auto point = gameRenderer->pointInUnits({mouseX, mouseY});
+    if (point.x >= 0)
     {
-        connectModel.resetCycle();
-        currentPreview = position.x;
-        connectGui.previewMode = true;
-        connectModel.preview(position.x);
-        connectGui.previewMode = false;
+        if (pointInRect(point, grid.rect))
+        {
+            auto position = grid.coordinate(point);
+            if (currentPreview != position.x)
+            {
+                connectModel.resetCycle();
+                currentPreview = position.x;
+                connectGui.previewMode = true;
+                connectModel.preview(position.x);
+                connectGui.previewMode = false;
+            }
+            return;
+        }
     }
+    currentPreview = -1;
+    connectModel.resetCycle();
 }
 
 void ConnectGame::run()
@@ -138,15 +141,23 @@ void ConnectGame::run()
 
 void ConnectGame::forward()
 {
-    connectModel.forward();
     connectModel.resetCycle();
     currentPreview = -1;
+    connectModel.forward();
+    int x,y;
+    SDL_GetMouseState(&x, &y);
+    hover(x*2, y*2);
 }
 
 void ConnectGame::backward()
 {
-    connectModel.backward();
     connectModel.resetCycle();
     currentPreview = -1;
+
+    connectModel.backward();
+    
+    int x,y;
+    SDL_GetMouseState(&x, &y);
+    hover(x*2, y*2);
 }
    

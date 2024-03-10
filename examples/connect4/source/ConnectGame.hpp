@@ -14,7 +14,7 @@ public:
 
     void handleEvent(const SDL_Event& event) override;
     void clicked(const Coordinate& pos);
-    void hover(const Coordinate& pos);
+    void hover(int, int);
 
     void forward();
     void backward();

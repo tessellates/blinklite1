@@ -23,6 +23,7 @@ void BLSDLRenderer::applyResolution(int xResolution, int yResolution)
     absoluteLayout.y = -absoluteLayout.h/2+yResolution*frameLayout.y;
     absoluteLayout.x = -absoluteLayout.w/2+xResolution*frameLayout.x;
     updateContext();
+    //resetTextures();
 }
 
 void BLSDLRenderer::setInternalUnits(const SDL_Point& units)
@@ -47,9 +48,29 @@ void BLSDLRenderer::render()
 {
     SDL_SetRenderDrawColor(renderer, backgroundColor.r, backgroundColor.b, backgroundColor.g, backgroundColor.a); // Color #deebd4
     SDL_RenderFillRect(renderer, &absoluteLayout);
-    for (auto& layer : layers)
+    if (textureLayerMode)
     {
-        layer.render();
+        for (auto& layer : textureLayers)
+        {
+            layer.render();
+        }
+        SDL_SetRenderTarget(renderer, NULL);
+
+        for (auto& layer : textureLayers)
+        {
+            SDL_Rect clip = absoluteLayout;
+
+            clip.x = 0;
+            clip.y = 0;
+            SDL_RenderCopy(renderer, layer.layerTexture, nullptr, &absoluteLayout);
+        }
+    }
+    else
+    {
+        for (auto& layer : layers)
+        {
+            layer.render();
+        }
     }
 }
 
@@ -59,11 +80,26 @@ void BLSDLRenderer::clear()
     {
         layer.clear();
     }
+    if (textureLayerMode)
+    {
+        for (auto& layer : textureLayers)
+        {
+            layer.clear();
+        }  
+    }
+
 }
 
 void BLSDLRenderer::addRenderTarget(const RenderInfo& info)
 {
-    layers[info.layerID].addToLayer([this, info]() {this->renderInfo(info);});
+    if (textureLayerMode)
+    {
+        textureLayers[info.layerID].addToLayer([this, info]() {this->renderInfo(info);});
+    }
+    else
+    {
+        layers[info.layerID].addToLayer([this, info]() {this->renderInfo(info);});
+    }
 }
 
 void BLSDLRenderer::renderInfo(const RenderInfo& info, bool debug)
@@ -73,16 +109,27 @@ void BLSDLRenderer::renderInfo(const RenderInfo& info, bool debug)
     SDL_Texture* texture = textureManager.getTexture(info.textureID);
     if (texture == nullptr) {
         std::cout << "textureID:" << info.textureID << " not found" << std::endl;
-        // Handle cases where texture is not found, such as drawing a placeholder or logging an error
-        return;
+        texture = textureManager.getTexture(0);
     }
 
     auto destf = info.dest;
-    multiply_rect_x(destf, xScale);
-    multiply_rect_y(destf, yScale);
+    if(textureLayerMode)
+    {
+        multiply_rect_x(destf, txScale);
+        multiply_rect_y(destf, tyScale);
+    }
+    else
+    {
+        multiply_rect_x(destf, xScale);
+        multiply_rect_y(destf, yScale);
+    }
     auto dest = cast_rect_smart(destf);
-    dest.x += absoluteLayout.x;
-    dest.y += absoluteLayout.y;
+    if (!textureLayerMode)
+    {
+        dest.x += absoluteLayout.x;
+        dest.y += absoluteLayout.y;
+    }
+
     if (debug)
     {
         std::cout << "-------------" << destf.x << std::endl;
@@ -98,7 +145,23 @@ void BLSDLRenderer::renderInfo(const RenderInfo& info, bool debug)
     //dest.w = std::min(dest.w, absoluteLayout.w);
 
     // Calculate the rotation center
-    SDL_Point center = {dest.h / 2, dest.h / 2};
+    SDL_Point* center = nullptr;
+    SDL_Point centerStack;
+
+    if (info.rotation != 0)
+    {
+        if (!info.useCenter)
+        {
+            // resort to default center;
+            int size = std::min(dest.h, dest.w);
+            centerStack = {size/2, size/2};
+        }
+        else
+        {
+            centerStack = info.center;
+        }
+        center = &centerStack;
+    }
 
     const SDL_Rect* clip = &info.clip;
     if (info.clip.h == 0 || info.clip.w == 0)
@@ -106,7 +169,7 @@ void BLSDLRenderer::renderInfo(const RenderInfo& info, bool debug)
         clip = nullptr;
     }
     // Perform the actual rendering
-    SDL_RenderCopyEx(renderer, texture, clip, &dest, info.rotation, &center, info.flip);
+    SDL_RenderCopyEx(renderer, texture, clip, &dest, info.rotation, center, info.flip);
     //DL_RenderCopy(renderer, texture, clip, &dest);
 }
 
@@ -121,5 +184,39 @@ Vec2 BLSDLRenderer::pointInUnits(const SDL_Point& point)
     else
     {
         return {-1, -1};
+    }
+}
+
+void BLSDLRenderer::toggleTextureLayerMode(bool enable)
+{
+    if (!textureLayerMode && enable)
+    {
+        textureLayerMode = enable;
+        resetTextures();
+        std::cout << "LAYER IS ON" << std::endl;
+        return;
+    }
+    else
+    {
+        std::cout << "LAYER IS OFF" << std::endl;
+        textureLayerMode = enable;
+    }
+}
+
+void BLSDLRenderer::resetTextures()
+{
+    if (textureLayerMode)
+    {
+        for (auto& layer : textureLayers)
+        {
+            layer.renderer = renderer;
+            if (layer.layerTexture != nullptr)
+            {
+                layer.destroyTexture();
+            }
+            layer.initTexture(absoluteLayout.w,absoluteLayout.h);
+        }
+        txScale = xScale;
+        tyScale = yScale;
     }
 }

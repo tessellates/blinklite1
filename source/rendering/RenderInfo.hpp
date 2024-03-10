@@ -27,9 +27,11 @@ struct RenderInfo
     //float opacity;
 
     SDL_Rect clip;
+    SDL_Point center;
+    bool useCenter = false;
 
     RenderInfo() : dest({0,0,0,0}), textureID(0), rotation(0),
-                   layerID(0), visible(true), flip(SDL_FLIP_NONE), clip({}) {}
+                   layerID(0), visible(true), flip(SDL_FLIP_NONE), clip({0,0,0,0}), center({0,0}) {}
 };
 
 inline void printInfo(RenderInfo& info)

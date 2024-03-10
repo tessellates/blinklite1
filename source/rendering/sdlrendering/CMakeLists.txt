@@ -9,6 +9,7 @@ target_sources(${PROJECT_NAME}
     PRIVATE 
         ${CMAKE_CURRENT_SOURCE_DIR}/BLSDLRenderer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/BLSDLRenderLayer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/BLSDLRenderTextureLayer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/BLSDLTextureManager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/FrameRateCounter.cpp
 )
