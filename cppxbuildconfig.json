@@ -14,6 +14,11 @@
             "name": "connect4",
             "path": ".",
             "exe": "examples/connect4/connect4"
+        },
+        {
+            "name": "check",
+            "path": ".",
+            "exe": "examples/textureCheck/textureCheck"
         }
     ],
     "cmake_actions": [],

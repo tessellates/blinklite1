@@ -26,7 +26,7 @@ public:
     void updateDisplay();
 
     static BlinkGame* activeGame();
-    static BLSDLRenderer& mainRenderer();
+    static SDL_Renderer* activeRenderer();
     static const SDL_Rect& currentDisplay();
     static void changeWindow(const std::pair<int,int>& );
     void changeWindow();
@@ -58,7 +58,6 @@ private:
     bool isInit = false;
 
     SDL_Texture* test;
-    BLSDLRenderer blRenderer;
 
     int xResolution;
     int yResolution;
@@ -70,4 +69,6 @@ private:
     GameClock clock;
 
     FrameRateCounter frc;
+    
+    bool hasToggled = true;
 };

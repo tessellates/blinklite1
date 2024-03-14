@@ -40,6 +40,7 @@ inline SDL_Texture* CreateColorTexture(SDL_Renderer* renderer, Uint32 color) {
 
     // Set blend mode to blend for transparency
     SDL_SetTextureBlendMode(colorTexture, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 
     Uint8 r = (color >> 24) & 0xFF; // Shift right 24 bits to get the red component
     Uint8 g = (color >> 16) & 0xFF; // Shift right 16 bits to get the green component

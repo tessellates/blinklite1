@@ -7,12 +7,20 @@
 void ConnectGame::init()
 {
     resolutions = {{360,360}, {720, 720}, {1080,1080}};
-    gameRenderer = &BLApplication::mainRenderer();
+    gameRenderer = new BLSDLRenderer();
+    gameRenderer->renderer = BLApplication::activeRenderer();
+    gameRenderer->textureManager.addTexture(CreateTextureFromFile(gameRenderer->renderer, "assets/sdlbackdrop.png"));
+    
+    gameRenderer->frameLayout = {0.5, 0.5, 1, 1};
+    auto display = BLApplication::currentDisplay();
+    gameRenderer->applyResolution(display.w*2, display.h*2);
+
+
     //int gridU = 72;
     gameRenderer->setInternalUnits({72, 72});
-    gameRenderer->toggleTextureLayerMode(true);
+    //gameRenderer->toggleTextureLayerMode(true);
 
-    grid = Grid({4.5,9,63,54}, 7, 6);
+    grid = Grid({4,9,63,54}, 7, 6);
     connectGui.init(grid);
     connectGui.gameRenderer = gameRenderer;
     connectModel = ConnectModel();
@@ -31,27 +39,27 @@ void ConnectGame::init()
     gameRenderer->textureManager.addTexture(CreateGridTexture(gameRenderer->renderer, tile, 7, 6));
     gameRenderer->textureManager.addTexture(CreateTextureFromFile(gameRenderer->renderer, "assets/TOP.png"));
     gameRenderer->textureManager.addTexture(CreateGridTexture(gameRenderer->renderer, tile2, 7, 6));
-    background.dest = {4.5,9,63,54};
+    background.dest = {4,9,63,54};
     background.layerID = 0;
     background.textureID = 7;
     foreground = background;
     foreground.layerID = 3;
     foreground.textureID = 9;
-    top.dest = {4.5,4,63,5};
+    top.dest = {4,4,63,5};
     top.layerID = 2;
     top.textureID = 8;
-    bot.dest = {4.5,63,63,5};
+    bot.dest = {4,63,63,5};
     bot.layerID = 2;
     bot.textureID = 8;
     bot.flip = SDL_FLIP_VERTICAL;
 
-    side1.dest = {67.5,5,62,2};
+    side1.dest = {67,5,62,2};
     side1.layerID = 2;
     side1.textureID = 8;
     side1.rotation = 90;
     side2 = side1;
     side2.rotation = 90;
-    side2.dest = {2.5,5,62,2};
+    side2.dest = {2,5,62,2};
     side2.flip = SDL_FLIP_VERTICAL;
 }
 
@@ -90,6 +98,10 @@ void ConnectGame::handleEvent(const SDL_Event& event)
             if (event.key.keysym.sym == SDLK_RIGHT)
             {
                 forward();
+            }
+            if (event.key.keysym.sym == SDLK_t)
+            {
+                gameRenderer->toggleTextureLayerMode(!gameRenderer->textureLayerMode);
             }
             break;
         }
@@ -161,3 +173,17 @@ void ConnectGame::backward()
     hover(x*2, y*2);
 }
    
+void ConnectGame::render() 
+{
+    gameRenderer->render();
+}
+
+void ConnectGame::clear()
+{
+    gameRenderer->clear();
+}
+
+void ConnectGame::applyResolution(int x, int y)
+{
+    gameRenderer->applyResolution(x,y);
+}

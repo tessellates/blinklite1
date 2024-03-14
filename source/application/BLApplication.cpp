@@ -45,7 +45,9 @@ int BLApplication::run()
 
 void BLApplication::loop()
 {
-    SDL_SetRenderDrawColor(renderer, 0,0,0,255);
+    SDL_SetRenderDrawColor(renderer, 0,0,0,0);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_RenderClear(renderer);
 
     while (SDL_PollEvent(&event))
     {
@@ -58,46 +60,36 @@ void BLApplication::loop()
         {
             if (event.key.keysym.sym == SDLK_ESCAPE) {
                 imguiToggle = !imguiToggle;
+                hasToggled = true;
             }
             if (event.key.keysym.sym == SDLK_t) {
-                blRenderer.toggleTextureLayerMode(!blRenderer.textureLayerMode);
+                //blRenderer.toggleTextureLayerMode(!blRenderer.textureLayerMode);
             }
         }
         if (event.type == BL_RESOLUTIONCHANGE)
         {
             changeWindow();
+            hasToggled = true;
+
         }
         if (event.type == BL_FULLSCREEN_TOGGLE)
         {
             toggleFullscreen();
+            hasToggled = true;
         }
         if (!imguiToggle && game != nullptr)   
             game->handleEvent(event);
     }
 
-    SDL_RenderClear(renderer);
     clock.update();
     BLApplication::deltaTime = clock.getDeltaTime();
     if (game != nullptr && !imguiToggle)
     {
-        blRenderer.clear();
+        game->clear();
         game->run();
     }
-    if (game == nullptr)
-    {
-        /*
-        blRenderer.clear();
-        // Set up the destination rectangle
-        SDL_Rect dest_rect {0, 0};
-        dest_rect.w = blRenderer.internalUnits.x;
-        dest_rect.h = blRenderer.internalUnits.y;
-        RenderInfo info {};
-        info.dest = dest_rect;
-        info.textureID = 0;
-        info.layerID = 1;
-        blRenderer.addRenderTarget(info);*/
-    }
-    blRenderer.render();
+
+    game->render();
 
     SDL_SetRenderDrawColor(renderer, 0,0,0,255);
 
@@ -110,7 +102,11 @@ void BLApplication::loop()
         float x = (float)xResolution/display.w;
         float y = (float)yResolution/display.h;
 
-        blRenderer.applyResolution(display.w, display.h); 
+        if (game != nullptr && hasToggled)
+        {
+            game->applyResolution(display.w, display.h); 
+            hasToggled = false;
+        }
         menu->applyResolution(display.w, display.h);
         
         ImGui::NewFrame();
@@ -122,8 +118,13 @@ void BLApplication::loop()
     }
     else
     {
-        SDL_RenderSetLogicalSize(renderer, xResolution, yResolution);
-        blRenderer.applyResolution(xResolution, yResolution);
+        if (hasToggled)
+        {
+            SDL_RenderSetLogicalSize(renderer, xResolution, yResolution);
+            if (game)
+                game->applyResolution(xResolution, yResolution); 
+            hasToggled = false;
+        }
     }
     frc.update();
     if (BLApplication::frameRate)
@@ -142,7 +143,7 @@ void BLApplication::init(bool test)
     SDL_WindowFlags window_flags =  (SDL_WindowFlags)(SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_ALLOW_HIGHDPI);
     window = SDL_CreateWindow("BLINKLITE", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, display.w, display.h, window_flags);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
-
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 
     if (window_flags & SDL_WINDOW_ALLOW_HIGHDPI)
@@ -195,14 +196,14 @@ void BLApplication::init(bool test)
     //ImGui::GetStyle().ScaleAllSizes(4);
 
     isInit = true;
-    blRenderer.renderer = renderer;
+    //blRenderer.renderer = renderer;
     menu = new BlinkMenu();
     menu->addResolutions(resolutions);
     if (test)
-        blRenderer.textureManager.addTexture(CreateTextureFromFile(renderer, "assets/sdlbackdrop.png"));
+        //blRenderer.textureManager.addTexture(CreateTextureFromFile(renderer, "assets/sdlbackdrop.png"));
 
-    blRenderer.frameLayout = {0.5, 0.5, 1, 1};
-    blRenderer.applyResolution(xResolution, yResolution);
+    //blRenderer.frameLayout = {0.5, 0.5, 1, 1};
+    //blRenderer.applyResolution(xResolution, yResolution);
 
     std::cout << "STATS FOR CATS" << std::endl;
     std::cout << "xres:" << xResolution << std::endl;
@@ -255,15 +256,16 @@ BlinkGame* BLApplication::activeGame()
     return BLApplication::instance()->game;
 }
 
-BLSDLRenderer& BLApplication::mainRenderer()
-{
-    return BLApplication::instance()->blRenderer;
-}
-
 const SDL_Rect& BLApplication::currentDisplay()
 {
     return BLApplication::instance()->display;
 }
+
+SDL_Renderer* BLApplication::activeRenderer()
+{
+    return BLApplication::instance()->renderer;
+}
+
 
 void BLApplication::changeWindow(const std::pair<int,int>& size)
 {

@@ -34,6 +34,7 @@ void ConnectGui::addConnectEntity(const Coordinate& position, int color)
     node.updatePosition();
     TextureInfo info;
     info.dest = {0, 0, grid.xsize, grid.ysize};
+    info.layerID = 1;
     info.textureID = textureID;
 
     if (!previewMode)
