@@ -2,6 +2,8 @@
 
 #include <SDL.h>
 #include "RenderInfo.hpp"
+#include <vector>
+#include <functional>
 
 class BLSDLRenderTextureLayer
 {
