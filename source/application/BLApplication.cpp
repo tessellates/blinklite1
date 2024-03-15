@@ -62,9 +62,6 @@ void BLApplication::loop()
                 imguiToggle = !imguiToggle;
                 hasToggled = true;
             }
-            if (event.key.keysym.sym == SDLK_t) {
-                //blRenderer.toggleTextureLayerMode(!blRenderer.textureLayerMode);
-            }
         }
         if (event.type == BL_RESOLUTIONCHANGE)
         {

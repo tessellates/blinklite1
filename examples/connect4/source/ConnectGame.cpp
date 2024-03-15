@@ -6,40 +6,42 @@
 
 void ConnectGame::init()
 {
+    float pixelSize = 32;
+    int pint = 32;
     resolutions = {{360,360}, {720, 720}, {1080,1080}};
-    gameRenderer = new BLSDLRenderer();
-    gameRenderer->renderer = BLApplication::activeRenderer();
-    gameRenderer->textureManager.addTexture(CreateTextureFromFile(gameRenderer->renderer, "assets/sdlbackdrop.png"));
-    
-    gameRenderer->frameLayout = {0.5, 0.5, 1, 1};
     auto display = BLApplication::currentDisplay();
-    gameRenderer->applyResolution(display.w*2, display.h*2);
-
-
-    //int gridU = 72;
-    gameRenderer->setInternalUnits({72, 72});
-    //gameRenderer->toggleTextureLayerMode(true);
-
-    grid = Grid({4,9,63,54}, 7, 6);
+    windowContext.setFrameLayout({0.5, 0.5, 1, 1}, display.w*2, display.h*2);
+    gameRenderer.context.setFrameLayout({0.5, 0.5, 1, 1}, pixelSize*7, pixelSize*7);
+    gameRenderer.renderer = BLApplication::activeRenderer();
+    gameRenderer.target = SDL_CreateTexture(gameRenderer.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, pint*7, pint*7);
+    gameRenderer.textureManager.addTexture(CreateTextureFromFile(gameRenderer.renderer, "assets/sdlbackdrop.png"));
+    
+    windowContext.setInternalUnits({pint*7, pint*7});
+    gameRenderer.context.setInternalUnits({pint*7, pint*7});
+    Rect gridRect = {0,16,pixelSize*7,pixelSize*6};
+    grid = Grid(gridRect, 7, 6);
     connectGui.init(grid);
-    connectGui.gameRenderer = gameRenderer;
+    connectGui.gameRenderer = &gameRenderer;
     connectModel = ConnectModel();
     connectModel.addConnectEntity.push_back([&](const Coordinate& p, int c) {this->connectGui.addConnectEntity(p, c);});
     connectModel.removeConnectEntity.push_back([&](const Coordinate& p) {this->connectGui.removeConnectEntity(p);});
     connectModel.changeConnectEntity.push_back([&](const Coordinate& p, int c) {this->connectGui.changeConnectEntity(p, c);});
 
-    gameRenderer->textureManager.addTexture(CreateTextureFromFile(gameRenderer->renderer, "assets/rcoin.png"));
-    gameRenderer->textureManager.addTexture(CreateTextureFromFile(gameRenderer->renderer, "assets/gcoin.png"));
-    gameRenderer->textureManager.addTexture(CreateColorTexture(gameRenderer->renderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 255, 255, 0, 180)));
-    gameRenderer->textureManager.addTexture(CreateColorTexture(gameRenderer->renderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 255, 0, 0, 80)));
-    gameRenderer->textureManager.addTexture(CreateColorTexture(gameRenderer->renderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 0, 255, 0, 80)));
-    gameRenderer->textureManager.addTexture(CreateColorTexture(gameRenderer->renderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 255, 255, 50, 180)));
-    SDL_Texture* tile = CreateTextureFromFile(gameRenderer->renderer, "assets/node.png");
-    SDL_Texture* tile2 = CreateTextureFromFile(gameRenderer->renderer, "assets/nodef.png");
-    gameRenderer->textureManager.addTexture(CreateGridTexture(gameRenderer->renderer, tile, 7, 6));
-    gameRenderer->textureManager.addTexture(CreateTextureFromFile(gameRenderer->renderer, "assets/TOP.png"));
-    gameRenderer->textureManager.addTexture(CreateGridTexture(gameRenderer->renderer, tile2, 7, 6));
-    background.dest = {4,9,63,54};
+    gameRenderer.textureManager.addTexture(CreateTextureFromFile(gameRenderer.renderer, "assets/rcoin.png"));
+    gameRenderer.textureManager.addTexture(CreateTextureFromFile(gameRenderer.renderer, "assets/gcoin.png"));
+    gameRenderer.textureManager.addTexture(CreateColorTexture(gameRenderer.renderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 255, 255, 0, 180)));
+    auto indexRed = gameRenderer.textureManager.addTexture(CreateColorTexture(gameRenderer.renderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 255, 0, 0, 80)));
+    auto indexGreen = gameRenderer.textureManager.addTexture(CreateColorTexture(gameRenderer.renderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 255, 0, 0, 80)));
+    //SDL_SetTextureBlendMode(gameRenderer.textureManager.textures[indexRed], SDL_BLENDMODE_NONE);
+    //SDL_SetTextureBlendMode(gameRenderer.textureManager.textures[indexGreen], SDL_BLENDMODE_NONE);
+    gameRenderer.textureManager.addTexture(CreateColorTexture(gameRenderer.renderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 255, 255, 50, 180)));
+    SDL_Texture* tile = CreateTextureFromFile(gameRenderer.renderer, "assets/node.png");
+    SDL_Texture* tile2 = CreateTextureFromFile(gameRenderer.renderer, "assets/nodef.png");
+    gameRenderer.textureManager.addTexture(CreateGridTexture(gameRenderer.renderer, tile, 7, 6));
+    gameRenderer.textureManager.addTexture(CreateTextureFromFile(gameRenderer.renderer, "assets/TOP.png"));
+    gameRenderer.textureManager.addTexture(CreateGridTexture(gameRenderer.renderer, tile2, 7, 6));
+    
+    background.dest = gridRect;
     background.layerID = 0;
     background.textureID = 7;
     foreground = background;
@@ -78,7 +80,7 @@ void ConnectGame::handleEvent(const SDL_Event& event)
             {
                 int mouseX = event.button.x;
                 int mouseY = event.button.y;
-                auto point = gameRenderer->pointInUnits({mouseX, mouseY});
+                auto point = windowContext.pointInUnits({mouseX, mouseY});
                 if (point.x >= 0)
                 {
                     if (pointInRect(point, grid.rect))
@@ -99,10 +101,6 @@ void ConnectGame::handleEvent(const SDL_Event& event)
             {
                 forward();
             }
-            if (event.key.keysym.sym == SDLK_t)
-            {
-                gameRenderer->toggleTextureLayerMode(!gameRenderer->textureLayerMode);
-            }
             break;
         }
     }
@@ -119,7 +117,7 @@ void ConnectGame::clicked(const Coordinate& position)
 
 void ConnectGame::hover(int mouseX, int mouseY)
 {
-    auto point = gameRenderer->pointInUnits({mouseX, mouseY});
+    auto point = windowContext.pointInUnits({mouseX, mouseY});
     if (point.x >= 0)
     {
         if (pointInRect(point, grid.rect))
@@ -142,12 +140,16 @@ void ConnectGame::hover(int mouseX, int mouseY)
 
 void ConnectGame::run()
 {
-    gameRenderer->addRenderTarget(background);
-    gameRenderer->addRenderTarget(top);
-    gameRenderer->addRenderTarget(bot);
-    gameRenderer->addRenderTarget(side1);
-    gameRenderer->addRenderTarget(side2);
-    gameRenderer->addRenderTarget(foreground);
+    /*
+    gameRenderer.addRenderTarget(background);
+    gameRenderer.addRenderTarget(top);
+    gameRenderer.addRenderTarget(bot);
+    gameRenderer.addRenderTarget(side1);
+    gameRenderer.addRenderTarget(side2);
+    gameRenderer.addRenderTarget(foreground);
+    */
+    gameRenderer.addRenderTarget(background);
+    gameRenderer.addRenderTarget(foreground);
     connectGui.render();
 }
 
@@ -175,15 +177,16 @@ void ConnectGame::backward()
    
 void ConnectGame::render() 
 {
-    gameRenderer->render();
+    gameRenderer.render();
+    SDL_RenderCopy(gameRenderer.renderer, gameRenderer.target, nullptr, &windowContext.absoluteLayout);
 }
 
 void ConnectGame::clear()
 {
-    gameRenderer->clear();
+    gameRenderer.clear();
 }
 
 void ConnectGame::applyResolution(int x, int y)
 {
-    gameRenderer->applyResolution(x,y);
+    windowContext.applyResolution(x,y);
 }

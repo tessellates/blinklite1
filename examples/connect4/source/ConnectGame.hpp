@@ -3,6 +3,7 @@
 #include "BlinkGame.hpp"
 #include "ConnectGui.hpp"
 #include "ConnectModel.hpp"
+#include "LayeredRenderer.hpp"
 
 class ConnectGame : public BlinkGame
 {
@@ -33,8 +34,11 @@ public:
     int currentPreview = -1;
     
     Grid grid;
+    BlinkContext windowContext;
+    SDL_Texture* main;
 
-    BLSDLRenderer* gameRenderer;
+    LayeredRenderer gameRenderer;
+    
     RenderInfo background;
     RenderInfo foreground;
     RenderInfo top;

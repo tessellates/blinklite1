@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "BlinkContext.hpp"
+#include "SDLUtil.hpp"
 
 void BlinkContext::applyResolution(int xResolution, int yResolution)
 {
@@ -43,4 +44,13 @@ Vec2 BlinkContext::pointInUnits(const SDL_Point& point)
     }
 }
 
-SDL_Rect
+SDL_Rect BlinkContext::internalToAbsolute(const Rect& rect)
+{
+    auto destf = rect;
+    multiply_rect_x(destf, xScale);
+    multiply_rect_y(destf, yScale);
+    auto dest = cast_rect_smart(destf);
+    dest.x += absoluteLayout.x;
+    dest.y += absoluteLayout.y;
+    return dest;
+}

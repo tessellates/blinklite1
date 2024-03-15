@@ -11,7 +11,7 @@
 #include "Node.hpp"
 #include "TextureInfo.hpp"
 #include "Grid.hpp"
-#include "BLSDLRenderer.hpp"
+#include "LayeredRenderer.hpp"
 
 class ConnectGui
 {
@@ -30,7 +30,7 @@ public:
 
     Grid grid;
 
-    BLSDLRenderer* gameRenderer;
+    LayeredRenderer* gameRenderer;
     bool previewMode = false;
 };
 

@@ -1,6 +1,3 @@
-add_subdirectory(rendertools)
-add_subdirectory(sdlrendering)
-
 target_include_directories(${PROJECT_NAME}
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
@@ -9,5 +6,6 @@ target_include_directories(${PROJECT_NAME}
 # Sources
 target_sources(${PROJECT_NAME}
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/RenderInfo.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/BlinkContext.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/LayeredRenderer.cpp
 )

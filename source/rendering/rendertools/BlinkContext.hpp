@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FrameLayout.hpp"
+#include "BLDefs.hpp"
 
 class BlinkContext {
 public:
@@ -9,8 +10,9 @@ public:
     void applyResolution(int xResolution, int yResolution);
     void setInternalUnits(const SDL_Point&);
     void setFrameLayout(const FrameLayout&, int, int);
+    void updateContext();
     Vec2 pointInUnits(const SDL_Point& point);
-    SDL_Rect 
+    SDL_Rect internalToAbsolute(const Rect& rect);
 
 public:
     FrameLayout frameLayout;

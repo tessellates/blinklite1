@@ -10,6 +10,6 @@ public:
     ~BLSDLTextureManager();
     SDL_Texture* getTexture(size_t textureID) const;
     size_t addTexture(SDL_Texture* texture);
-private:
+public:
     std::vector<SDL_Texture*> textures;
 };
