@@ -4,6 +4,7 @@
 #include "SDLUserEvents.hpp"
 #include "GameClock.hpp"
 #include "FrameRateCounter.hpp"
+#include <vector>
 
 #include <SDL.h>
 #include "imgui.h"

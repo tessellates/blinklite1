@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 #include "BLutils.hpp"
+#include <cmath>
 
 enum Anchor
 {
