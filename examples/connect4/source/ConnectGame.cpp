@@ -12,10 +12,9 @@ void ConnectGame::init()
     resolutions = {{768*diff,768}, {1344, 1152}, {1080*diff,1024}};
     auto display = BLApplication::currentDisplay();
     frameRenderer = LayeredRenderer();
-    frameRenderer.context.frameLayout = {0.5, 0.5, float(6)/8, float(7)/6};
+    frameRenderer.context.frameLayout = {0.5, 0.5, float(6)/8, float(7)/6, CENTER, CENTER, true, {res*7, res*6}};
     //frameRenderer.context.frameLayout = {0.5, 0.5, 1, float(7)/6};
 
-    frameRenderer.context.pixelPerfectMode = true;
     gameRenderer = LayeredRenderer();
     gameRenderer.context.setFrameLayout({0.5, 0.5, 1, 1.16666666667}, res*7, res*6);
     
@@ -24,7 +23,6 @@ void ConnectGame::init()
     gameRenderer.textureManager.addTexture(CreateTextureFromFile(gameRenderer.renderer, "assets/sdlbackdrop.png"));
     gameRenderer.backgroundColor = {222, 235, 212, 255};
     frameRenderer.context.setInternalUnits({pint*7, pint*6});
-    frameRenderer.context.contextPixelSize = {res*7, res*6};
     frameRenderer.context.applyResolution(display.w, display.h);
 
     gameRenderer.context.setInternalUnits({pint*7, pint*6});

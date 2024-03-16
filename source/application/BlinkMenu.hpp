@@ -16,9 +16,8 @@ public:
     void run();
 
     float scaleFactor = 1;
-    FrameLayout layout = {0.02, 0.05, 0.9, 0.9, NEGATIVE, NEGATIVE};
-    ImVec2 absolutePos;
-    ImVec2 absoluteSize;
+    FrameLayout layout = {0.01, 0.5, 0.95, 0.4, POSITIVE, CENTER};
+    SDL_Rect absoluteLayout;
 
     std::vector<std::string> validResolutions;
 };

@@ -5,22 +5,7 @@
 
 void BlinkContext::applyResolution(int xResolution, int yResolution)
 {
-    if (pixelPerfectMode)
-    {
-        absoluteLayout.h = std::round(yResolution*frameLayout.ySize);
-        absoluteLayout.h = (absoluteLayout.h/contextPixelSize.y)*contextPixelSize.y;
-        if (absoluteLayout.h == 0)
-        {
-            absoluteLayout.h = contextPixelSize.y;
-        }
-    }
-    else
-    {
-        absoluteLayout.h = std::round(yResolution*frameLayout.ySize);
-    }
-    absoluteLayout.w = std::round(absoluteLayout.h*frameLayout.xyRatio);
-    absoluteLayout.y = -absoluteLayout.h/2+yResolution*frameLayout.y;
-    absoluteLayout.x = -absoluteLayout.w/2+xResolution*frameLayout.x;
+    absoluteLayout = createAbsoluteLayout(frameLayout, xResolution, yResolution);
     updateContext();
 }
 

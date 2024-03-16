@@ -26,8 +26,8 @@ void BlinkMenu::run()
     ImGui::SetNextWindowBgAlpha(0.5f); // Adjust the alpha as needed
 
     // Set the initial position and size of the settings window (adjust as necessary)
-    ImGui::SetNextWindowPos(absolutePos);
-    ImGui::SetNextWindowSize(absoluteSize);
+    ImGui::SetNextWindowPos({(float)absoluteLayout.x, (float)absoluteLayout.y});
+    ImGui::SetNextWindowSize({(float)absoluteLayout.w, (float)absoluteLayout.h});
 
     // Begin the settings window
     ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
@@ -91,10 +91,7 @@ void BlinkMenu::init() {}
 
 void BlinkMenu::applyResolution(int x, int y)
 {
-    absolutePos.x = x * layout.x;
-    absolutePos.y = y * layout.y;
-    absoluteSize.y = y * layout.ySize;
-    absoluteSize.x = absoluteSize.y*layout.xyRatio;
+    absoluteLayout = createAbsoluteLayout(layout, x, y);
 }
 
 void BlinkMenu::addResolutions(const std::vector<std::pair<int,int>>& sizes)
