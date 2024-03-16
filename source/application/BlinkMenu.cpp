@@ -3,23 +3,6 @@
 
 #include <vector>
 
-std::vector<std::string> GenerateResolutions(int maxX, int maxY) {
-    std::vector<std::string> validResolutions;
-
-    // Example resolutions, typically you'd generate these based on aspect ratios
-    const std::vector<std::pair<int, int>> commonResolutions = {
-        {800, 600}, {1024, 768}, {1280, 720}, {1920, 1080}
-    };
-
-    for (const auto& res : commonResolutions) {
-        if (res.first <= maxX && res.second <= maxY) {
-            validResolutions.push_back(std::to_string(res.first) + "x" + std::to_string(res.second));
-        }
-    }
-
-    return validResolutions;
-}
-
 void BlinkMenu::run()
 {
     // Set the background alpha of the next window (this is optional)
