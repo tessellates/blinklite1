@@ -1,2 +1,3 @@
 add_subdirectory(connect4)
 add_subdirectory(textureCheck)
+add_subdirectory(space)

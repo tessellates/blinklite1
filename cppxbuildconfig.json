@@ -19,6 +19,11 @@
             "name": "check",
             "path": ".",
             "exe": "examples/textureCheck/textureCheck"
+        },
+        {
+            "name": "space",
+            "path": ".",
+            "exe": "examples/space/space"
         }
     ],
     "cmake_actions": [],
