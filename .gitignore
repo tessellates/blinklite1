@@ -13,6 +13,8 @@ tests/**/*.xcodeproj
 
 ## Xcode
 xcodeproject
+xcode
+xcode/*
 xcodeproject/*
 !*.xcodeproj
 

@@ -16,7 +16,7 @@ public:
     void run();
 
     float scaleFactor = 1;
-    FrameLayout layout = {0.02, 0.02, 0.9, 0.5, NEGATIVE, NEGATIVE};
+    FrameLayout layout = {0.02, 0.05, 0.9, 0.9, NEGATIVE, NEGATIVE};
     ImVec2 absolutePos;
     ImVec2 absoluteSize;
 

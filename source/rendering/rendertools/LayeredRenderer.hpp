@@ -14,6 +14,7 @@ class RenderInfo;
 class LayeredRenderer {
 public:
     LayeredRenderer() = default;
+    ~LayeredRenderer();
     void render();
     void clear();
     void addRenderTarget(const RenderInfo& info);

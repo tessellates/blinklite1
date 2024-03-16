@@ -5,10 +5,22 @@
 
 void BlinkContext::applyResolution(int xResolution, int yResolution)
 {
-    absoluteLayout.h = yResolution*frameLayout.ySize;
-    absoluteLayout.w = absoluteLayout.h*frameLayout.xyRatio;
+    if (pixelPerfectMode)
+    {
+        absoluteLayout.h = std::round(yResolution*frameLayout.ySize);
+        absoluteLayout.h = (absoluteLayout.h/contextPixelSize.y)*contextPixelSize.y;
+        if (absoluteLayout.h == 0)
+        {
+            absoluteLayout.h = contextPixelSize.y;
+        }
+    }
+    else
+    {
+        absoluteLayout.h = std::round(yResolution*frameLayout.ySize);
+    }
+    absoluteLayout.w = std::round(absoluteLayout.h*frameLayout.xyRatio);
     absoluteLayout.y = -absoluteLayout.h/2+yResolution*frameLayout.y;
-    absoluteLayout.x = -absoluteLayout.w/2+xResolution*frameLayout.x;
+    absoluteLayout.x = -absoluteLayout.w/2+xResolution*frameLayout.x + 1;
     updateContext();
 }
 
@@ -30,7 +42,7 @@ void BlinkContext::updateContext()
     yScale = (float)absoluteLayout.h/(float)internalUnits.y;
 }
 
-Vec2 BlinkContext::pointInUnits(const SDL_Point& point)
+Vec2 BlinkContext::pointInUnits(const SDL_Point& point) const
 {
     if (SDL_PointInRect(&point, &absoluteLayout)) 
     {
@@ -44,7 +56,7 @@ Vec2 BlinkContext::pointInUnits(const SDL_Point& point)
     }
 }
 
-SDL_Rect BlinkContext::internalToAbsolute(const Rect& rect)
+SDL_Rect BlinkContext::internalToAbsolute(const Rect& rect) const
 {
     auto destf = rect;
     multiply_rect_x(destf, xScale);
@@ -53,4 +65,22 @@ SDL_Rect BlinkContext::internalToAbsolute(const Rect& rect)
     dest.x += absoluteLayout.x;
     dest.y += absoluteLayout.y;
     return dest;
+}
+
+SDL_Point BlinkContext::internalToAbsolute(const Vec2& point) const
+{
+    SDL_Point result = {(int)(point.x*xScale), (int)(point.y*yScale)};
+    return result;
+}
+
+void BlinkContext::print()
+{
+    std::cout << "height:" << absoluteLayout.h << std::endl;
+    std::cout << "width:" << absoluteLayout.w << std::endl;
+    std::cout << "x:" << absoluteLayout.x << std::endl;
+    std::cout << "y:"<<  absoluteLayout.y << std::endl;
+    std::cout << "pixely:" << absoluteLayout.h%contextPixelSize.y << std::endl;
+    std::cout << "pixelx:" << absoluteLayout.w%contextPixelSize.x << std::endl;
+    std::cout << "iux:" << internalUnits.x << std::endl;
+    std::cout << "iuy:" << internalUnits.y << std::endl;
 }

@@ -93,7 +93,7 @@ void BlinkMenu::applyResolution(int x, int y)
 {
     absolutePos.x = x * layout.x;
     absolutePos.y = y * layout.y;
-    absoluteSize.y = y* layout.ySize;
+    absoluteSize.y = y * layout.ySize;
     absoluteSize.x = absoluteSize.y*layout.xyRatio;
 }
 

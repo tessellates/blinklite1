@@ -34,15 +34,17 @@ public:
     int currentPreview = -1;
     
     Grid grid;
-    BlinkContext windowContext;
-    SDL_Texture* main;
 
     LayeredRenderer gameRenderer;
-    
+    LayeredRenderer frameRenderer;
+    BlinkContext main;
+    BlinkContext contextHack;
+
     RenderInfo background;
     RenderInfo foreground;
     RenderInfo top;
     RenderInfo bot;
     RenderInfo side1;
     RenderInfo side2;
+    int res = 32;
 };

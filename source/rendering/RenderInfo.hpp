@@ -27,7 +27,7 @@ struct RenderInfo
     //float opacity;
 
     SDL_Rect clip;
-    SDL_Point center;
+    Vec2 center;
     bool useCenter = false;
 
     RenderInfo() : dest({0,0,0,0}), textureID(0), rotation(0),

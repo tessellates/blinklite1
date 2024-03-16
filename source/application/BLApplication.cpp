@@ -149,7 +149,7 @@ void BLApplication::init(bool test)
         float ddpi, hdpi, vdpi;
         SDL_GetDisplayDPI(0, &ddpi, &hdpi, &vdpi); // Assuming displayIndex 0 for simplicity
         float baseDpi = 108.5f; // Adjust this base DPI to your needs
-        scaleFactor = 2;//ddpi / baseDpi;
+        scaleFactor = 1;//ddpi / baseDpi;
     }
     else
     {

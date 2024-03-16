@@ -169,7 +169,7 @@ void BLSDLRenderer::renderInfo(const RenderInfo& info, bool debug)
         }
         else
         {
-            centerStack = info.center;
+            centerStack = {(int)info.center.x, (int)info.center.y};
         }
         center = &centerStack;
     }

@@ -42,7 +42,7 @@ void ConnectGui::addConnectEntity(const Coordinate& position, int color)
         if (true)
         {
             auto end = grid.point(position);
-            auto movementComponent = AccMovementComponent(start, end, 500);
+            auto movementComponent = AccMovementComponent(start, end, 750);
             Node::UpdateMethod movementLambda = [movementComponent](Node& node) mutable {
                 return movementComponent.update(node);
             };
