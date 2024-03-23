@@ -16,7 +16,7 @@ public:
     void run();
 
     float scaleFactor = 1;
-    FrameLayout layout = {0.01, 0.5, 0.95, 0.4, POSITIVE, CENTER};
+    FrameLayout layout = {0.5, 0.5, 0.95, 0.4, CENTER, CENTER};
     SDL_Rect absoluteLayout;
 
     std::vector<std::string> validResolutions;

@@ -12,7 +12,7 @@ void ConnectGame::init()
     resolutions = {{768*diff,768}, {1344, 1152}, {1080*diff,1024}};
     auto display = BLApplication::currentDisplay();
     frameRenderer = LayeredRenderer();
-    frameRenderer.context.frameLayout = {0.5, 0.5, float(6)/8, float(7)/6, CENTER, CENTER, true, {res*7, res*6}};
+    frameRenderer.context.frameLayout = {0.5, 0.5, 1, float(7)/6, CENTER, CENTER, true, {res*7, res*6}};
     gameRenderer = LayeredRenderer();
     gameRenderer.context.setFrameLayout({0.5, 0.5, 1, 1.16666666667}, res*7, res*6);
     
@@ -177,7 +177,7 @@ void ConnectGame::forward()
     connectModel.forward();
     int x,y;
     SDL_GetMouseState(&x, &y);
-    hover(x*2, y*2);
+    hover(x, y);
 }
 
 void ConnectGame::backward()
@@ -189,7 +189,7 @@ void ConnectGame::backward()
     
     int x,y;
     SDL_GetMouseState(&x, &y);
-    hover(x*2, y*2);
+    hover(x, y);
 }
    
 void ConnectGame::render() 

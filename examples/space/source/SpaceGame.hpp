@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BlinkGame.hpp"
+#include "LayeredRenderer.hpp"
 
 class SpaceGame : public BlinkGame
 {
@@ -28,4 +29,8 @@ public:
     int startX = 0, startY = 0;
     int currentX = 0, currentY = 0;
     float distance = 0.0f;
+    float scale = 1;
+    int tsize = 256;
+    LayeredRenderer lrender1;
+    SDL_Point internalUnits = {0,0};
 };

@@ -13,9 +13,12 @@ LayeredRenderer::~LayeredRenderer()
 void LayeredRenderer::render()
 {
     SDL_SetRenderTarget(renderer, target);
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
-    SDL_SetRenderDrawColor(renderer, backgroundColor.r, backgroundColor.b, backgroundColor.g, backgroundColor.a); // Color #deebd4
-    SDL_RenderFillRect(renderer, &context.absoluteLayout);
+    if (target != NULL)
+    {
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+        SDL_SetRenderDrawColor(renderer, backgroundColor.r, backgroundColor.b, backgroundColor.g, backgroundColor.a); // Color #deebd4
+        SDL_RenderFillRect(renderer, &context.absoluteLayout);
+    }
     
     for (auto& layer : layers)
     {

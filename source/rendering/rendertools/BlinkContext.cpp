@@ -64,8 +64,6 @@ void BlinkContext::print()
     std::cout << "width:" << absoluteLayout.w << std::endl;
     std::cout << "x:" << absoluteLayout.x << std::endl;
     std::cout << "y:"<<  absoluteLayout.y << std::endl;
-    std::cout << "pixely:" << absoluteLayout.h%contextPixelSize.y << std::endl;
-    std::cout << "pixelx:" << absoluteLayout.w%contextPixelSize.x << std::endl;
     std::cout << "iux:" << internalUnits.x << std::endl;
     std::cout << "iuy:" << internalUnits.y << std::endl;
 }

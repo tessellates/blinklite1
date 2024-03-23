@@ -16,6 +16,12 @@ inline void multiply_rect_y(SDL_Rect& rect, float multiplier)
     rect.h *= multiplier;
 }
 
+inline void multiply_rect(SDL_Rect& rect, float multiplier)
+{
+    multiply_rect_x(rect, multiplier);
+    multiply_rect_y(rect, multiplier);
+}
+
 inline void multiply_rect_x(Rect& rect, float multiplier)
 {
     rect.x *= multiplier;

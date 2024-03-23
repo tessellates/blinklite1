@@ -23,7 +23,4 @@ public:
 
     float xScale = 1;
     float yScale = 1;
-
-    bool pixelPerfectMode = false;
-    SDL_Point contextPixelSize = {1,1};
 };
