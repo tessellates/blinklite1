@@ -45,12 +45,12 @@ inline SDL_Rect cast_rect_smart(const Rect& rect)
     if (int(rect.x+rect.z) > result.x + result.w)
     {
         result.w++;
-        std::cout << "pixel-miss-detected" << std::endl;
+        //std::cout << "pixel-miss-detected" << std::endl;
     }
     if (int(rect.y+rect.w) > result.y + result.h)
     {
         result.h++;
-        std::cout << "pixel-miss-detected" << std::endl;
+        //std::cout << "pixel-miss-detected" << std::endl;
     }
     return result;
 }

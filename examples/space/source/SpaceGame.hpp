@@ -2,6 +2,8 @@
 
 #include "BlinkGame.hpp"
 #include "LayeredRenderer.hpp"
+#include "TextureInfo.hpp"
+#include "Node.hpp"
 
 class SpaceGame : public BlinkGame
 {
@@ -30,7 +32,18 @@ public:
     int currentX = 0, currentY = 0;
     float distance = 0.0f;
     float scale = 1;
-    int tsize = 256;
+    int tsize = 1024;
     LayeredRenderer lrender1;
     SDL_Point internalUnits = {0,0};
+
+    LayeredRenderer entityRenderer1;
+    Node playerNode;
+    TextureInfo playerTexture;
+    Vec2 velocity = {0,0};
+    Vec2 accel = {0,0};
+    int keydown = 0;
+    float speed = 0.1;
+    BlinkContext mid;
+    BlinkContext midline;
+    float shiftmod = 4;
 };
