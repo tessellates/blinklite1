@@ -5,17 +5,29 @@ project(blinklite VERSION 1.0
 DESCRIPTION "2D engine -- for simple 2D games"
 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(CMAKE_CXX_STANDARD 20)  # Set the C++ standard to C++17
+set(CMAKE_CXX_STANDARD_REQUIRED ON)  # Make the C++ standard required
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${${PROJECT_NAME}_BINARY_DIR}/lib")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${${PROJECT_NAME}_BINARY_DIR}/bin")
+
+if(WIN32)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+else()
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
+endif()
+
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${CMAKE_CURRENT_SOURCE_DIR}/build")
 
 # To prevent Apple frameworks from being included before brew installed packages
 include_directories(BEFORE /usr/local/include)
 set(CMAKE_FIND_FRAMEWORK LAST) 
 
 # SDL
-find_package(SDL2_ttf REQUIRED)
-find_package(SDL2_IMAGE REQUIRED)
-find_package(SDL2 REQUIRED)
+find_package(SDL3 REQUIRED CONFIG)
+find_package(glm REQUIRED CONFIG)
 
 # Create the library
 add_library(${PROJECT_NAME})
@@ -54,7 +66,8 @@ if(BUILD_TESTS)
 endif()
 
 # Link SDL to the library
-target_link_libraries(${PROJECT_NAME} PUBLIC SDL2::SDL2main SDL2::SDL2 SDL2_image::SDL2_image SDL2_ttf::SDL2_ttf)
+target_link_libraries(${PROJECT_NAME} PUBLIC glm::glm)
+target_link_libraries(${PROJECT_NAME} PUBLIC SDL3::SDL3)
 
 # Enable imgui default math operator
 add_compile_definitions(IMGUI_DEFINE_MATH_OPERATORS)
