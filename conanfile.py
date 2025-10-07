@@ -15,8 +15,6 @@ class BlinkLite1(ConanFile):
         self.requires("glm/1.0.1")
         if self.options.emscripten:
             self.tool_requires("emsdk/3.1.73")
-        self.tool_requires("cmake/[>=3.25]")
-
     def generate(self):
         deps = CMakeDeps(self)
         deps.generate()

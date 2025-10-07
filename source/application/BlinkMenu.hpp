@@ -4,6 +4,7 @@
 #include "FrameLayout.hpp"
 #include <SDL3/SDL.h>
 #include <vector>
+#include <string>
 
 class BlinkMenu
 {
