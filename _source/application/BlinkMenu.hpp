@@ -2,7 +2,7 @@
 
 #include "imgui.h"
 #include "FrameLayout.hpp"
-#include <SDL3/SDL.h>
+
 #include <vector>
 
 class BlinkMenu
@@ -13,12 +13,11 @@ public:
     void applyResolution(int xResolution, int yResolution);
     void addResolutions(const std::vector<std::pair<int,int>>&);
     void init();
-    void run(SDL_Renderer* renderer);
-    void internals();
+    void run();
 
     float scaleFactor = 1;
-    FrameLayout layout = {0.5, 0.5, 0.95, 0.95, CENTER, CENTER};
-    glm::ivec4 absoluteLayout;
+    FrameLayout layout = {0.01, 0.5, 0.95, 0.4, POSITIVE, CENTER};
+    SDL_Rect absoluteLayout;
 
     std::vector<std::string> validResolutions;
 };

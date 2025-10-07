@@ -27,6 +27,7 @@ set(CMAKE_FIND_FRAMEWORK LAST)
 
 # SDL
 find_package(SDL3 REQUIRED CONFIG)
+find_package(SDL3_ttf REQUIRED CONFIG)
 find_package(glm REQUIRED CONFIG)
 
 # Create the library
@@ -47,9 +48,9 @@ endif()
 set(BLINKLIB ${PROJECT_NAME})
 
 # examples -- fully fletched out examples
-option(BUILD_EXAMPLES "Build examples" ON)
+option(BUILD_EXAMPLES "Build examples" OFF)
 if(BUILD_EXAMPLES)
-    add_subdirectory(examples) 
+    #add_subdirectory(examples) 
 endif()
 
 
@@ -68,7 +69,7 @@ endif()
 # Link SDL to the library
 target_link_libraries(${PROJECT_NAME} PUBLIC glm::glm)
 target_link_libraries(${PROJECT_NAME} PUBLIC SDL3::SDL3)
-
+#target_link_libraries(${PROJECT_NAME} PUBLIC SDL3_ttf::SDL3_ttf-static)
 # Enable imgui default math operator
 add_compile_definitions(IMGUI_DEFINE_MATH_OPERATORS)
 

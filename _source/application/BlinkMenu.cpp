@@ -1,38 +1,23 @@
 #include "BlinkMenu.hpp"
-#include "imgui_impl_sdl3.h"
-#include "imgui_impl_sdlrenderer3.h"
+#include "BLApplication.hpp"
+
 #include <vector>
 
-void BlinkMenu::run(SDL_Renderer* renderer)
+void BlinkMenu::run()
 {
-    ImGui_ImplSDLRenderer3_NewFrame();
-    ImGui_ImplSDL3_NewFrame();  
-    //applyResolution(display.w, display.h);
-    ImGui::NewFrame();
-    internals();
-    ImGui::Render();
-    //SDL_RenderSetLogicalSize(renderer, display.w, display.h);
-    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
-}
-
-void BlinkMenu::internals()
-{
-
-
-    
     // Set the background alpha of the next window (this is optional)
     ImGui::SetNextWindowBgAlpha(0.5f); // Adjust the alpha as needed
 
     // Set the initial position and size of the settings window (adjust as necessary)
     ImGui::SetNextWindowPos({(float)absoluteLayout.x, (float)absoluteLayout.y});
-    ImGui::SetNextWindowSize({(float)absoluteLayout.z, (float)absoluteLayout.w});
+    ImGui::SetNextWindowSize({(float)absoluteLayout.w, (float)absoluteLayout.h});
 
     // Begin the settings window
     ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
     // Title for the settings category
     ImGui::Text("Game Settings");
-    /*
+
     // Fullscreen toggle
     if (ImGui::Checkbox("Fullscreen", &BLApplication::isFullscreen)) {
         SDL_Event event;
@@ -69,15 +54,15 @@ void BlinkMenu::internals()
 
     // Fullscreen toggle
     if (ImGui::Checkbox("Framerate", &BLApplication::frameRate)) {
-    }*/
+    }
     /*
     // V-Sync toggle
     static bool isVsyncEnabled = false;
     ImGui::Checkbox("Enable V-Sync", &isVsyncEnabled);
-    */
+
     // Sound volume slider
-    //static float soundVolume = 0.5f; // Assuming 0.5 is the initial volume level
-    //ImGui::SliderFloat("Sound Volume", &soundVolume, 0.0f, 1.0f);
+    static float soundVolume = 0.5f; // Assuming 0.5 is the initial volume level
+    ImGui::SliderFloat("Sound Volume", &soundVolume, 0.0f, 1.0f);*/
 
     // Add other settings as needed
 

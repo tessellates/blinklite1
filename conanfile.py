@@ -10,7 +10,8 @@ class BlinkLite1(ConanFile):
     default_options = {"emscripten": False}
 
     def requirements(self):
-        self.requires("sdl/3.2.6", options={"shared": False})
+        self.requires("sdl/3.2.20", options={"shared": False})
+        self.requires("sdl_ttf/3.2.2", options={"shared": False})
         self.requires("glm/1.0.1")
         if self.options.emscripten:
             self.tool_requires("emsdk/3.1.73")

@@ -37,12 +37,12 @@ def main(setup = True, emscripten=False, runonly=True):
             venv_context.run_command('conan', *command_args)
 
         venv_context.run_command('conan', 'build', '.',  '-of=build', '-s', f'build_type={build_type}', f"-pr:b={profile}", f"-pr:h={hostprofile}")
-        subprocess.check_call([f'./build/bin/driver'])
+        subprocess.check_call([f'./build/bin/main'])
     else:
         if platform.system() == 'Windows':
             subprocess.check_call([os.path.join('install', 'run', 'driver.exe')])
         else:
-            subprocess.check_call([f'./build/bin/driver'])
+            subprocess.check_call([f'./build/bin/main'])
         
     print('-- end build script --')
     return

@@ -18,7 +18,7 @@ void ConnectGame::init()
     
     gameRenderer.renderer = BLApplication::activeRenderer();
     gameRenderer.target = SDL_CreateTexture(gameRenderer.renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, res*7, res*6);
-    gameRenderer.textureManager.addTexture(CreateTextureFromFile(gameRenderer.renderer, "assets/sdlbackdrop.png"));
+    gameRenderer.textureManager.addTexture(CreateTextureFromBMP(gameRenderer.renderer, "assets/sdlbackdrop.png"));
     gameRenderer.backgroundColor = {222, 235, 212, 255};
     frameRenderer.context.setInternalUnits({pint*7, pint*6});
     frameRenderer.context.applyResolution(display.w, display.h);
@@ -35,14 +35,14 @@ void ConnectGame::init()
     connectModel.removeConnectEntity.push_back([&](const Coordinate& p) {this->connectGui.removeConnectEntity(p);});
     connectModel.changeConnectEntity.push_back([&](const Coordinate& p, int c) {this->connectGui.changeConnectEntity(p, c);});
 
-    gameRenderer.textureManager.addTexture(CreateTextureFromFile(gameRenderer.renderer, "assets/rcoin.png"));
-    gameRenderer.textureManager.addTexture(CreateTextureFromFile(gameRenderer.renderer, "assets/gcoin.png"));
+    gameRenderer.textureManager.addTexture(CreateTextureFromBMP(gameRenderer.renderer, "assets/rcoin.png"));
+    gameRenderer.textureManager.addTexture(CreateTextureFromBMP(gameRenderer.renderer, "assets/gcoin.png"));
     gameRenderer.textureManager.addTexture(CreateColorTexture(gameRenderer.renderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 255, 255, 0, 180)));
     auto indexRed = gameRenderer.textureManager.addTexture(CreateColorTexture(gameRenderer.renderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 255, 0, 0, 80)));
     auto indexGreen = gameRenderer.textureManager.addTexture(CreateColorTexture(gameRenderer.renderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 0, 255, 0, 80)));
     gameRenderer.textureManager.addTexture(CreateColorTexture(gameRenderer.renderer, SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888), 255, 255, 50, 180)));
-    SDL_Texture* tile = CreateTextureFromFile(gameRenderer.renderer, "assets/node.png");
-    SDL_Texture* tile2 = CreateTextureFromFile(gameRenderer.renderer, "assets/nodef.png");
+    SDL_Texture* tile = CreateTextureFromBMP(gameRenderer.renderer, "assets/node.png");
+    SDL_Texture* tile2 = CreateTextureFromBMP(gameRenderer.renderer, "assets/nodef.png");
     gameRenderer.textureManager.addTexture(CreateGridTexture(gameRenderer.renderer, tile, 7, 6));
     gameRenderer.textureManager.addTexture(CreateGridTexture(gameRenderer.renderer, tile2, 7, 6));
     background.dest = gridRect;
@@ -52,7 +52,7 @@ void ConnectGame::init()
     foreground.layerID = 3;
     foreground.textureID = 8;
 
-    frameRenderer.textureManager.addTexture(CreateTextureFromFile(gameRenderer.renderer, "assets/TOP.png"));
+    frameRenderer.textureManager.addTexture(CreateTextureFromBMP(gameRenderer.renderer, "assets/TOP.png"));
     frameRenderer.renderer = gameRenderer.renderer;
     top.dest = {0,-pixelSize,pixelSize*7,pixelSize};
     top.layerID = 2;

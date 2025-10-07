@@ -19,7 +19,7 @@ public:
     SDL_Texture* test2;
     SDL_Texture* test3;
     SDL_Texture* test4;
-    SDL_Rect dest;
+    SDL_FRect dest;
 
     int color = 0;
 

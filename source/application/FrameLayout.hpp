@@ -1,8 +1,10 @@
 #pragma once
 
-#include <SDL.h>
-#include "BLutils.hpp"
+#include <SDL3/SDL.h>
+#include <glm/vec2.hpp>
+#include <glm/vec4.hpp>
 #include <cmath>
+#include <algorithm>
 
 enum Anchor
 {
@@ -13,72 +15,43 @@ enum Anchor
 
 struct FrameLayout
 {
-    float x = 0.5;
+    float x = 0.5; 
     float y = 0.5;
     float ySize = 1;
     float xyRatio = 1;
     Anchor xAnchor = CENTER;
     Anchor yAnchor = CENTER;
     bool pixelPerfectMode = false;
-    SDL_Point contextPixelSize = {1,1};
+    glm::ivec2 contextPixelSize = {1,1};
 };
 
-inline SDL_Rect createAbsoluteLayout(const FrameLayout& frameLayout, int xResolution, int yResolution)
-{
-    SDL_Rect absoluteLayout;
-    absoluteLayout.h = std::round(yResolution*frameLayout.ySize);
-
-    if (frameLayout.pixelPerfectMode)
-    {
-        absoluteLayout.h = (absoluteLayout.h/frameLayout.contextPixelSize.y)*frameLayout.contextPixelSize.y;
-        if (absoluteLayout.h == 0)
-        {
-            absoluteLayout.h = frameLayout.contextPixelSize.y;
-        }
+inline glm::ivec4 createAbsoluteLayout(const FrameLayout& f, int xRes, int yRes) {
+    int h = std::lround(yRes * f.ySize);
+    if (f.pixelPerfectMode) {
+        const int step = std::max(1, f.contextPixelSize.y);
+        h = std::max(step, (h / step) * step);
     }
 
-    absoluteLayout.w = std::round(absoluteLayout.h*frameLayout.xyRatio);
-    if (absoluteLayout.w > xResolution)
-    {
-        absoluteLayout.w = xResolution;
+    int w = std::lround(h * f.xyRatio);
+    w = std::min(w, xRes);
+
+    int x = 0, y = 0;
+
+    switch (f.xAnchor) {
+        case Anchor::CENTER:   x = std::lround(xRes * f.x - w * 0.5f); break;
+        case Anchor::NEGATIVE: x = std::lround(xRes * f.x);            break;
+        case Anchor::POSITIVE: x = std::lround(xRes - xRes * f.x - w); break;
+    }
+    switch (f.yAnchor) {
+        case Anchor::CENTER:   y = std::lround(yRes * f.y - h * 0.5f); break;
+        case Anchor::NEGATIVE: y = std::lround(yRes * f.y);            break;
+        case Anchor::POSITIVE: y = std::lround(yRes - yRes * f.y - h); break;
     }
 
-    switch(frameLayout.xAnchor)
-    {
-        case CENTER:
-        {
-            absoluteLayout.x = -absoluteLayout.w/2+xResolution*frameLayout.x;
-            break;
-        }
-        case NEGATIVE:
-        {
-            absoluteLayout.x = xResolution*frameLayout.x;
-            break;
-        }
-        case POSITIVE:
-        {
-            absoluteLayout.x = xResolution-xResolution*frameLayout.x-absoluteLayout.w;
-            break;
-        }
-    }
+    return {x, y, w, h};
+}
 
-    switch(frameLayout.yAnchor)
-    {
-        case CENTER:
-        {
-            absoluteLayout.y = -absoluteLayout.h/2+yResolution*frameLayout.y;
-            break;
-        }
-        case NEGATIVE:
-        {
-            absoluteLayout.y = yResolution*frameLayout.y;
-            break;
-        }
-        case POSITIVE:
-        {
-            absoluteLayout.y = yResolution-yResolution*frameLayout.y-absoluteLayout.y;
-            break;
-        }
-    }
-    return absoluteLayout;
+// convenience overload: resolution as ivec2
+inline glm::ivec4 createAbsoluteLayout(const FrameLayout& f, glm::ivec2 res) {
+    return createAbsoluteLayout(f, res.x, res.y);
 }

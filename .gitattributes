@@ -1,0 +1,5 @@
+# For conan export, we want the to use eol=lf for all files. Otherwise, the source is different between linux and windows.
+* text=auto eol=lf
+ 
+# Conan recipe must match on all packages.
+conanfile.py text eol=lf
