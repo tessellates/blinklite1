@@ -89,6 +89,7 @@ void BlinkMenu::init() {}
 
 void BlinkMenu::applyResolution(int x, int y)
 {
+    layout.xyRatio = float(x) / float(y);
     absoluteLayout = createAbsoluteLayout(layout, x, y);
 }
 

@@ -22,6 +22,7 @@ struct MyApp : EngineAppBase {
     bool onInit() override {
         eng.init(EngineConfig{800,600,"Snake Demo", "0.1","snake_demo", true});
         mainMenu.applyResolution(800,600);
+        
         cb.step = [&](float dt, std::span<const EventData> in, RenderSnapshot2D& out){
             game.step(dt, in, out);};
         cb.render = [&](const RenderSnapshot2D& s){
@@ -37,7 +38,16 @@ struct MyApp : EngineAppBase {
         return true;
     }
 
-    
+    void onIterate(const std::span<const EventData>& acts) override {
+        for (auto& a: acts){
+            if (a.action == Event::Back){
+                inMenu = !inMenu;
+                eng.setCallbacks(inMenu? menuCb : cb);
+            }
+        }
+    }
+
+    bool inMenu = false;
     SnakeGame game;
     BlinkMenu mainMenu; 
     GameCallbacks menuCb;

@@ -7,27 +7,30 @@
 #include <span>
 #include "BlinkMenu.hpp"
 #include "GameClock.hpp"
+#include "EventStack.hpp"
 
 struct EngineAppBase {
-    Engine eng; SdlTranslator xlat; GameCallbacks cb;
+    Engine eng; SdlTranslator xlat; GameCallbacks cb; EventStack eventStack;
     GameClock clock{1.0f/60.0f};
     bool inMenu = false;
 
 
     virtual bool onInit() = 0;
     virtual void onShutdown(int) {}
+    virtual void onIterate(const std::span<const EventData>&) {}
 
     bool init(){
         return onInit();
     }
-    void onEvent(const SDL_Event& e){ xlat.on_event(e); }
+    void onEvent(const SDL_Event& e){ xlat.on_event(e, eventStack); }
 
     void iterate()
     {
-        const auto& acts = xlat.flush();
+        const auto& acts = eventStack.flush();
+        onIterate(acts);
         clock.update();
         eng.iterate(clock.getDeltaTime(), std::span<const EventData>(acts.data(), acts.size()));
-        xlat.reset();
+        eventStack.reset();
     }
     void shutdown(int code){ eng.quit(); onShutdown(code); }
 };
