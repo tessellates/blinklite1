@@ -10,7 +10,6 @@
 
 struct EngineAppBase {
     Engine eng; SdlTranslator xlat; GameCallbacks cb;
-    BlinkMenu mainMenu; GameCallbacks menuCb;
     GameClock clock{1.0f/60.0f};
     bool inMenu = false;
 
@@ -23,22 +22,11 @@ struct EngineAppBase {
     }
     void onEvent(const SDL_Event& e){ xlat.on_event(e); }
 
-    void iterate(){
+    void iterate()
+    {
         const auto& acts = xlat.flush();
-        if(xlat.main_menu != inMenu)
-        {
-            inMenu = xlat.main_menu;
-            if (inMenu)
-            {
-                eng.setCallbacks(menuCb);
-            }
-            else
-            {
-                eng.setCallbacks(cb);
-            }
-        }
         clock.update();
-        eng.iterate(clock.getDeltaTime(), std::span<const Actions>(acts.data(), acts.size()));
+        eng.iterate(clock.getDeltaTime(), std::span<const EventData>(acts.data(), acts.size()));
         xlat.reset();
     }
     void shutdown(int code){ eng.quit(); onShutdown(code); }

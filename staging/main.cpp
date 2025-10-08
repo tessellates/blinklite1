@@ -22,12 +22,12 @@ struct MyApp : EngineAppBase {
     bool onInit() override {
         eng.init(EngineConfig{800,600,"Snake Demo", "0.1","snake_demo", true});
         mainMenu.applyResolution(800,600);
-        cb.step = [&](float dt, std::span<const Actions> in, RenderSnapshot2D& out){
+        cb.step = [&](float dt, std::span<const EventData> in, RenderSnapshot2D& out){
             game.step(dt, in, out);};
         cb.render = [&](const RenderSnapshot2D& s){
             submit_quads((SDL_Renderer*)eng.getRenderer(), s);
         };
-        menuCb.step = [&](float dt, std::span<const Actions> in, RenderSnapshot2D& out){
+        menuCb.step = [&](float dt, std::span<const EventData> in, RenderSnapshot2D& out){
         };
         menuCb.render = [&](const RenderSnapshot2D& s){
             submit_quads((SDL_Renderer*)eng.getRenderer(), s);
@@ -36,7 +36,11 @@ struct MyApp : EngineAppBase {
         eng.setCallbacks(cb);
         return true;
     }
+
+    
     SnakeGame game;
+    BlinkMenu mainMenu; 
+    GameCallbacks menuCb;
 };
 
 ENGINE_DEFINE_SDL_APP(MyApp)

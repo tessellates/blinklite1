@@ -2,14 +2,14 @@
 #include <functional>
 #include "CoreTypes.hpp"
 #include <span>
-#include "Action.hpp"
+#include "Event.hpp"
 
 class Engine {
 public:
     bool init(const EngineConfig&);
     //int  run(const GameCallbacks&);
     void quit(); // request exit
-    void iterate(double dt, std::span<const Actions> actions); // one frame
+    void iterate(double dt, std::span<const EventData> events); // one frame
     void setCallbacks(const GameCallbacks& cbs) { callbacks = cbs; }
     void* getRenderer();
 private:

@@ -1,5 +1,5 @@
 #include "Engine.hpp"
-#include "Action.hpp"
+#include "Event.hpp"
 #include <SDL3/SDL.h>
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
@@ -48,7 +48,7 @@ void Engine::quit() {
     }
 }
 
-void Engine::iterate(double dt, std::span<const Actions> actions) {
+void Engine::iterate(double dt, std::span<const EventData> actions) {
     // Process input actions and update game state here
     // For now, just clear the screen with a color
     if (callbacks.step) {

@@ -6,7 +6,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 #include <span>
-#include "Action.hpp"
+#include "Event.hpp"
 
 using TextureHandle = uint32_t;
 
@@ -30,6 +30,6 @@ struct RenderSnapshot2D {
 struct EngineConfig { int w=1280, h=720; const char* title="Blink2D"; const char* version="1.0"; const char* id="example"; bool vsync=true; };
 
 struct GameCallbacks {
-    std::function<void(float, std::span<const Actions>, RenderSnapshot2D&)> step; // dt, input, output
+    std::function<void(float, std::span<const EventData>, RenderSnapshot2D&)> step; // dt, input, output
     std::function<void(const RenderSnapshot2D&)> render; // on-screen render
 };
