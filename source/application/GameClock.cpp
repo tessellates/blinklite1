@@ -1,5 +1,6 @@
 #include "GameClock.hpp"
 #include <iostream>
+#include <SDL3/SDL.h>
 
 GameClock::GameClock() : GameClock(1) {}
 

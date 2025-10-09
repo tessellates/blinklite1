@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL3/SDL.h>
+#include <cstdint>
 
 class GameClock {
 public:
@@ -14,12 +14,12 @@ public:
     float getProgress() const;
     void setGameSpeed(float gameSpeed); // Get the time elapsed since last frame in seconds
     float getGameSpeed() const; // Get the time elapsed since last frame in seconds
-    Uint32 getTotalTime() const; // Get the total elapsed time since the start of the clock in milliseconds
+    uint32_t getTotalTime() const; // Get the total elapsed time since the start of the clock in milliseconds
 
 private:
-    Uint32 lastTick; // Time of the last update call
-    Uint32 startTick; // The time when the clock was started
-    Uint32 intervalTick; // The time when the clock was started
+    uint32_t lastTick; // Time of the last update call
+    uint32_t startTick; // The time when the clock was started
+    uint32_t intervalTick; // The time when the clock was started
     float gameSpeed; // The time when the clock was started
     float deltaTime; // Time between the current frame and the last frame in seconds
     float intervalTime;// Time between

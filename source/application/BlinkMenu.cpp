@@ -3,6 +3,9 @@
 #include "imgui_impl_sdlrenderer3.h"
 #include <vector>
 
+#include "Engine.hpp"
+#include "EventStack.hpp"
+
 void BlinkMenu::run(SDL_Renderer* renderer)
 {
     ImGui_ImplSDLRenderer3_NewFrame();
@@ -11,7 +14,7 @@ void BlinkMenu::run(SDL_Renderer* renderer)
     ImGui::NewFrame();
     internals();
     ImGui::Render();
-    //SDL_RenderSetLogicalSize(renderer, display.w, display.h);
+    //SDL_SetRenderLogicalPresentation(renderer, 800, 600, SDL_LOGICAL_PRESENTATION_LETTERBOX);
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
 }
 
@@ -32,44 +35,19 @@ void BlinkMenu::internals()
 
     // Title for the settings category
     ImGui::Text("Game Settings");
-    /*
-    // Fullscreen toggle
-    if (ImGui::Checkbox("Fullscreen", &BLApplication::isFullscreen)) {
-        SDL_Event event;
-        SDL_zero(event); // Initialize the event to zero
-        event.type = BL_FULLSCREEN_TOGGLE;
-        SDL_PushEvent(&event);
-    }
 
-    static int currentResolution = 0; // Variable to store the current selection, change it as per your needs or application state
-    if (!BLApplication::isFullscreen)
+    if (isInit)
     {
-        if (ImGui::BeginCombo("Resolution", validResolutions[BLApplication::currentResolution].c_str())) {
-            for (int i = 0; i < validResolutions.size(); i++) {
-                bool isSelected = (BLApplication::currentResolution == i);
-                if (ImGui::Selectable(validResolutions[i].c_str(), isSelected)) {
-                    BLApplication::currentResolution = i; // Update the current resolution on selection
-                    //BLApplication::instance()->changeWindow();
-                    //BLApplication::changeWindow(BLApplication::instance()->resolutions[BLApplication::currentResolution]);
-                    SDL_Event event;
-                    SDL_zero(event); // Initialize the event to zero
-                    event.type = BL_RESOLUTIONCHANGE;
-                    SDL_PushEvent(&event);
-
-                }
-
-                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-                if (isSelected) {
-                    ImGui::SetItemDefaultFocus();
-                }
-            }
-            ImGui::EndCombo();
-        }        
+        if (ImGui::Checkbox("Fullscreen", &engine->isFullscreen)) {
+            eventStack->next.push_back({Event::FullscreenToggle, nullptr});
+        }
     }
 
     // Fullscreen toggle
-    if (ImGui::Checkbox("Framerate", &BLApplication::frameRate)) {
-    }*/
+    if (ImGui::Checkbox("Framerate", &this->frameRate)) 
+    {
+        eventStack->next.push_back({Event::FrameRateToggle, nullptr});
+    }
     /*
     // V-Sync toggle
     static bool isVsyncEnabled = false;
@@ -85,7 +63,12 @@ void BlinkMenu::internals()
     ImGui::End();
 }
 
-void BlinkMenu::init() {}
+void BlinkMenu::init(EventStack* es, Engine* e) 
+{ eventStack = es; engine = e; 
+    if (es && engine) {
+        isInit = true;
+    }
+};
 
 void BlinkMenu::applyResolution(int x, int y)
 {

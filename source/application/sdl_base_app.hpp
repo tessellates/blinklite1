@@ -8,10 +8,11 @@
 #include "BlinkMenu.hpp"
 #include "GameClock.hpp"
 #include "EventStack.hpp"
+#include "imgui_impl_sdl3.h"
 
 struct EngineAppBase {
     Engine eng; SdlTranslator xlat; GameCallbacks cb; EventStack eventStack;
-    GameClock clock{1.0f/60.0f};
+    GameClock clock{1.0f/120.0f};
     bool inMenu = false;
 
 
@@ -22,7 +23,9 @@ struct EngineAppBase {
     bool init(){
         return onInit();
     }
-    void onEvent(const SDL_Event& e){ xlat.on_event(e, eventStack); }
+    void onEvent(const SDL_Event& e){ 
+        ImGui_ImplSDL3_ProcessEvent(&e); 
+        xlat.on_event(e, eventStack); }
 
     void iterate()
     {

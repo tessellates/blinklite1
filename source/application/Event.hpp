@@ -1,5 +1,5 @@
 #pragma once
-enum class Event { Quit, Pause, Confirm, Back, MoveX, MoveY, MousePos, MouseWheel, MouseDown, MouseUp, WindowResized };
+enum class Event { Quit, Pause, Confirm, Back, MoveX, MoveY, MousePos, MouseWheel, MouseDown, MouseUp, WindowResized, FullscreenToggle, FrameRateToggle };
 
 struct EventData
 {

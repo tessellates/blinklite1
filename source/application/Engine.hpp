@@ -11,7 +11,10 @@ public:
     void quit(); // request exit
     void iterate(double dt, std::span<const EventData> events); // one frame
     void setCallbacks(const GameCallbacks& cbs) { callbacks = cbs; }
+    void toggleFullscreen();
     void* getRenderer();
+
+    bool isFullscreen = false;
 private:
     //bool pumpEvents(const GameCallbacks&);
     struct Impl; Impl* p_=nullptr;

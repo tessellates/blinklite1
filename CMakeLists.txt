@@ -69,7 +69,7 @@ endif()
 # Link SDL to the library
 target_link_libraries(${PROJECT_NAME} PUBLIC glm::glm)
 target_link_libraries(${PROJECT_NAME} PUBLIC SDL3::SDL3)
-#target_link_libraries(${PROJECT_NAME} PUBLIC SDL3_ttf::SDL3_ttf-static)
+target_link_libraries(${PROJECT_NAME} PUBLIC SDL3_ttf::SDL3_ttf-static)
 # Enable imgui default math operator
 add_compile_definitions(IMGUI_DEFINE_MATH_OPERATORS)
 

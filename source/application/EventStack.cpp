@@ -26,5 +26,10 @@ const std::vector<EventData>& EventStack::flush()
 void EventStack::reset()
 {
     out.clear();
+    out.swap(next);
+    next.clear();
+
     arena.clear();
+    arena.swap(nextArena);
+    nextArena.clear();
 }

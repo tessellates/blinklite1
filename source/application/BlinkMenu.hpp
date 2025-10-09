@@ -6,6 +6,9 @@
 #include <vector>
 #include <string>
 
+class EventStack;
+class Engine;
+
 class BlinkMenu
 {
 public:
@@ -13,7 +16,7 @@ public:
     virtual ~BlinkMenu() = default;
     void applyResolution(int xResolution, int yResolution);
     void addResolutions(const std::vector<std::pair<int,int>>&);
-    void init();
+    void init(EventStack* es, Engine* e);
     void run(SDL_Renderer* renderer);
     void internals();
 
@@ -22,4 +25,9 @@ public:
     glm::ivec4 absoluteLayout;
 
     std::vector<std::string> validResolutions;
+public:
+    EventStack* eventStack = nullptr;
+    Engine* engine = nullptr;
+    bool isInit = false;
+    bool frameRate = false;
 };

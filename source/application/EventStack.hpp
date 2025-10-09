@@ -10,7 +10,9 @@
 
 struct EventStack {
     std::vector<EventData> out;
+    std::vector<EventData> next;
     std::vector<std::byte> arena;
+    std::vector<std::byte> nextArena;
     bool holdL=false, holdR=false, holdU=false, holdD=false;
 
     // helpers

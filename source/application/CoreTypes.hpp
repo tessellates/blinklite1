@@ -33,3 +33,22 @@ struct GameCallbacks {
     std::function<void(float, std::span<const EventData>, RenderSnapshot2D&)> step; // dt, input, output
     std::function<void(const RenderSnapshot2D&)> render; // on-screen render
 };
+
+inline std::function<void(const RenderSnapshot2D&)> composeRender(const std::function<void(const RenderSnapshot2D&)>& a, const std::function<void(const RenderSnapshot2D&)>& b){
+
+    std::function<void(const RenderSnapshot2D&)> render = [=](const RenderSnapshot2D& s){
+        if (a) a(s);
+        if (b) b(s);       // order = a then b (e.g., menu overlays)
+    };
+    return render;
+}
+
+inline std::function<void(float, std::span<const EventData>, RenderSnapshot2D&)> composeStep(const std::function<void(float, std::span<const EventData>, RenderSnapshot2D&)>& a, const std::function<void(float, std::span<const EventData>, RenderSnapshot2D&)>& b){
+
+    std::function<void(float, std::span<const EventData>, RenderSnapshot2D&)> step = [=](float d, std::span<const EventData> e, RenderSnapshot2D& s)
+    {
+        if (a) a(d,e,s);
+        if (b) b(d,e,s);
+    };
+    return step;
+}
