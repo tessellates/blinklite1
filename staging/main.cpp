@@ -29,12 +29,10 @@ struct MyApp : EngineAppBase {
             game.step(dt, in, out);};
         cb.render = [&](const RenderSnapshot2D& s)
         {
-            frc.update();
             submit_quads((SDL_Renderer*)eng.getRenderer(), s);
         };
         menuCb.step = [&](float dt, std::span<const EventData> in, RenderSnapshot2D& out)
         {
-            frc.update();
         };
         menuCb.render = [&](const RenderSnapshot2D& s){
             submit_quads((SDL_Renderer*)eng.getRenderer(), s);

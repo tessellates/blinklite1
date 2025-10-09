@@ -15,6 +15,8 @@ void FrameRateCounter::update()
         frames = 0;
         prevTime = currentTime;
     }
+    std::string fpsText = "Frame rate: " + std::to_string(fps);
+    std::cout << fpsText << std::endl;
 }
 
 void FrameRateCounter::render() {
