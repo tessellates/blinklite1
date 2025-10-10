@@ -13,6 +13,9 @@ struct EventStack {
     std::vector<EventData> next;
     std::vector<std::byte> arena;
     std::vector<std::byte> nextArena;
+
+    bool axes_emitted = false;
+    
     bool holdL=false, holdR=false, holdU=false, holdD=false;
 
     // helpers

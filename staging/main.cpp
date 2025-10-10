@@ -39,10 +39,8 @@ struct MyApp : EngineAppBase {
             mainMenu.run((SDL_Renderer*)eng.getRenderer());
         };
         eng.setCallbacks(cb);
-        TTF_Init();
         TTF_Font* font = TTF_OpenFont("assets/Arial.ttf", 12);
         if (!font) {
-            std::cout << std::filesystem::current_path() << std::endl;
             std::cout << SDL_GetError() << std::endl;
         }
         frc = FrameRateCounter((SDL_Renderer*)eng.getRenderer(), font);

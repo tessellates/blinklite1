@@ -19,9 +19,8 @@ struct SnakeModel {
     Dir dir=Right;
     bool alive=true;
     float acc=0.f;        // time accumulator
-    float step_s=120.0f;   // snake speed (seconds/tile)
+    float step_s=180.0f;   // snake speed (seconds/tile)
     Dir buffer=None; // buffered dir input
-    Dir buffer2=None; // buffered dir input
 };
 
 #include <Event.hpp>
@@ -41,35 +40,21 @@ inline void snake_handle_actions(SnakeModel& m, std::span<const EventData> in){
                 if (y<-0.5f && m.dir!=Down && m.dir!=Up) m.buffer=Up;
             } 
         }
-        else if (m.buffer2 == None)
-        {
-            if (a.action==Event::MoveX)
-            {
-                float x = static_cast<const F1*>(a.data)->v;
-                if (x>0.5f && m.buffer!=Left)  m.buffer2=Right;
-                if (x<-0.5f && m.buffer!=Right) m.buffer2=Left;
-            } else if (a.action==Event::MoveY)
-            {
-                float y = static_cast<const F1*>(a.data)->v;
-                if (y>0.5f && m.buffer!=Up)    m.buffer2=Down;
-                if (y<-0.5f && m.buffer!=Down) m.buffer2=Up;
-            } 
-        }
     }
 }
 
 inline bool snake_step(SnakeModel& m, float dt){
     if (!m.alive) return false;
     m.acc += dt;
+
     bool moved = false;
-    while (m.acc >= m.step_s){
+    while (m.acc >= m.step_s) {// || (m.buffer != None && m.acc > m.step_s/3)) {
         if (m.buffer!=None){
             m.dir = m.buffer;
             m.buffer = None;
-            //m.buffer2 = None;
         }
         m.acc -= m.step_s;
-        if (m.acc >= m.step_s)
+        if (m.acc >= m.step_s || m.acc < 0)
             m.acc = 0; // avoid spiral of death
         auto head = m.body.front();
         if (m.dir==Up)    head.y -= 1;

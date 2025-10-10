@@ -15,15 +15,12 @@ void FrameRateCounter::update()
         frames = 0;
         prevTime = currentTime;
     }
-    std::string fpsText = "Frame rate: " + std::to_string(fps);
-    std::cout << fpsText << std::endl;
 }
 
 void FrameRateCounter::render() {
     // Render frame rate text
     std::string fpsText = "Frame rate: " + std::to_string(fps);
-    std::cout << fpsText << std::endl;
-    SDL_Surface* textSurface = TTF_RenderText_Solid(font, fpsText.c_str(), 14, textColor);
+    SDL_Surface* textSurface = TTF_RenderText_Solid(font, fpsText.c_str(), 20, textColor);
     if (textSurface) {
         if (textTexture)
             SDL_DestroyTexture(textTexture);

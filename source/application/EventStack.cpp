@@ -2,6 +2,7 @@
 
 void EventStack::emit_axes()
 {
+    axes_emitted = true;
     const float x = (holdR?1.f:0.f) - (holdL?1.f:0.f);
     const float y = (holdD?1.f:0.f) - (holdU?1.f:0.f);
     out.push_back({Event::MoveX, push(F1{ x })});
@@ -10,6 +11,11 @@ void EventStack::emit_axes()
 
 void EventStack::finalize_frame()
 {
+    if (axes_emitted)
+    {
+        axes_emitted = false;
+        return;
+    }
     const float x = (holdR?1.f:0.f) - (holdL?1.f:0.f);
     const float y = (holdD?1.f:0.f) - (holdU?1.f:0.f);
     out.push_back({Event::MoveX, push(F1{ x })});

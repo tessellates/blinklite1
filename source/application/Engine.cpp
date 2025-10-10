@@ -1,6 +1,7 @@
 #include "Engine.hpp"
 #include "Event.hpp"
 #include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_sdlrenderer3.h"
@@ -14,7 +15,7 @@ struct Engine::Impl {
 
 bool Engine::init(const EngineConfig& config) {
     SDL_SetAppMetadata(config.title, config.version, config.id);
-
+    SDL_SetHint(SDL_HINT_RENDER_VSYNC, "0");
     p_ = new Impl();
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
@@ -32,6 +33,14 @@ bool Engine::init(const EngineConfig& config) {
     ImGui_ImplSDL3_InitForSDLRenderer(p_->win, p_->ren);
     ImGui_ImplSDLRenderer3_Init(p_->ren);
     SDL_SetRenderVSync(p_->ren, 0);  // uncapped
+
+    int vs = 12345;
+    if (!SDL_GetRenderVSync(p_->ren, &vs))
+        std::cout<<"GetRenderVSync failed: " <<SDL_GetError() << std::endl;
+    else
+        std::cout<<"VSync =" << vs << " (0=off, 1+=on, -1=adaptive)" <<std::endl;
+
+    TTF_Init();
     // Store necessary state in Impl
     return true; // return false on failure
 }
@@ -64,6 +73,7 @@ void Engine::iterate(double dt, std::span<const EventData> actions) {
     if (callbacks.step) {
         callbacks.step(dt, actions, renderSnapshot); // Placeholder call to step callback
     }
+    
     if (p_ && p_->ren) {
         SDL_SetRenderDrawColor(p_->ren, 255, 255, 255, 255);
         SDL_RenderClear(p_->ren);
