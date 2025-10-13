@@ -16,9 +16,12 @@ public:
 
     bool isFullscreen = false;
 private:
+
+    void render(const RenderSnapshot2D& rs);
+
     //bool pumpEvents(const GameCallbacks&);
     struct Impl; Impl* p_=nullptr;
     GameCallbacks callbacks;
-    RenderSnapshot2D renderSnapshot;
+    RenderSnapshots2D renderSnapshots;
     
 };

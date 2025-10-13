@@ -9,11 +9,13 @@
 #include "GameClock.hpp"
 #include "EventStack.hpp"
 #include "imgui_impl_sdl3.h"
+#include "BaseModule.hpp"
 
 struct EngineAppBase {
     Engine eng; SdlTranslator xlat; GameCallbacks cb; EventStack eventStack;
     GameClock clock{1.0f/120.0f};
-    bool inMenu = false;
+
+    std::vector<BaseModule*> upd, draw;
 
 
     virtual bool onInit() = 0;
@@ -21,8 +23,40 @@ struct EngineAppBase {
     virtual void onIterate(const std::span<const EventData>&) {}
 
     bool init(){
-        return onInit();
+        onInit();
+        postInit();
+        return true;
     }
+
+    void addModule(BaseModule* m)
+    {
+        m->initialize(&eng, &eventStack);
+        upd.push_back(m);
+        draw.push_back(m);
+    }
+
+    void postInit()
+    {
+        std::sort(upd.begin(),  upd.end(),  [](auto a, auto b){ return a->updateOrder < b->updateOrder; });
+        std::sort(draw.begin(), draw.end(), [](auto a, auto b){ return a->drawOrder   < b->drawOrder;   });
+        generateCallbacks();
+    }
+
+    void generateCallbacks()
+    {
+        cb.tick = [&](float dt, const std::span<const EventData>& in){
+            for (auto m: upd) if (m->iterateEnabled) m->tick(dt, in);
+        };
+        cb.extract = [&]( RenderSnapshots2D& s)
+        {
+            for (auto m: draw) if (m->renderEnabled) m->extract(s);
+        };
+        eng.setCallbacks(cb);
+    }
+
+
+
+
     void onEvent(const SDL_Event& e){ 
         ImGui_ImplSDL3_ProcessEvent(&e); 
         xlat.on_event(e, eventStack); }

@@ -7,5 +7,6 @@ target_include_directories(${PROJECT_NAME}
 # Sources
 target_sources(${PROJECT_NAME}
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/Engine.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Command.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CommandHistory.cpp
 )

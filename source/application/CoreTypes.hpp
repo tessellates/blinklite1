@@ -25,30 +25,13 @@ struct QuadCmd {
 struct RenderSnapshot2D {
     OrthoCamera cam;
     std::vector<QuadCmd> quads;
+    std::function<void()> render;
 };
 
+using RenderSnapshots2D = std::vector<RenderSnapshot2D>;
 struct EngineConfig { int w=1280, h=720; const char* title="Blink2D"; const char* version="1.0"; const char* id="example"; bool vsync=true; };
 
 struct GameCallbacks {
-    std::function<void(float, std::span<const EventData>, RenderSnapshot2D&)> step; // dt, input, output
-    std::function<void(const RenderSnapshot2D&)> render; // on-screen render
+    std::function<void(float, const std::span<const EventData>& )> tick; // dt, input, output
+    std::function<void(RenderSnapshots2D&)> extract; // on-screen render
 };
-
-inline std::function<void(const RenderSnapshot2D&)> composeRender(const std::function<void(const RenderSnapshot2D&)>& a, const std::function<void(const RenderSnapshot2D&)>& b){
-
-    std::function<void(const RenderSnapshot2D&)> render = [=](const RenderSnapshot2D& s){
-        if (a) a(s);
-        if (b) b(s);       // order = a then b (e.g., menu overlays)
-    };
-    return render;
-}
-
-inline std::function<void(float, std::span<const EventData>, RenderSnapshot2D&)> composeStep(const std::function<void(float, std::span<const EventData>, RenderSnapshot2D&)>& a, const std::function<void(float, std::span<const EventData>, RenderSnapshot2D&)>& b){
-
-    std::function<void(float, std::span<const EventData>, RenderSnapshot2D&)> step = [=](float d, std::span<const EventData> e, RenderSnapshot2D& s)
-    {
-        if (a) a(d,e,s);
-        if (b) b(d,e,s);
-    };
-    return step;
-}

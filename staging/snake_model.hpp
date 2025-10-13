@@ -19,7 +19,7 @@ struct SnakeModel {
     Dir dir=Right;
     bool alive=true;
     float acc=0.f;        // time accumulator
-    float step_s=180.0f;   // snake speed (seconds/tile)
+    float step_s=240.0f;   // snake speed (seconds/tile)
     Dir buffer=None; // buffered dir input
 };
 
@@ -82,7 +82,7 @@ inline bool snake_step(SnakeModel& m, float dt){
 }
 
 #include <CoreTypes.hpp>
-inline void snake_extract(const SnakeModel& m, float cell, RenderSnapshot2D& out, bool& moved){
+inline void snake_extract(const SnakeModel& m, float cell, RenderSnapshot2D& out, bool moved){
     if (!moved) return;
     out.quads.clear();
     auto push_rect = [&](float x,float y, glm::vec4 color){
@@ -106,10 +106,10 @@ inline void snake_extract(const SnakeModel& m, float cell, RenderSnapshot2D& out
 
 struct SnakeGame {
     SnakeModel model{};
+    bool moved = false;
     float cell = 48.f; // pixels per cell
-    void step(float dt, std::span<const EventData> in, RenderSnapshot2D& out){
+    void tick(float dt, std::span<const EventData> in){
         snake_handle_actions(model, in);
-        bool moved = snake_step(model, dt);
-        snake_extract(model, cell, out, moved);
+        moved = snake_step(model, dt);
     }
 };

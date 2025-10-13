@@ -8,74 +8,81 @@
 #include <FrameRateCounter.hpp>
 #include <filesystem>
 
+
+struct FrameRateCounterModule : public BaseModule
+{
+    FrameRateCounter frc;
+    void extract( RenderSnapshots2D& s) override
+    {
+    RenderSnapshot2D rs;
+    rs.render = [this]()
+    {
+        frc.render();
+    };
+    s.push_back(rs);
+    }
+};
+
+struct SnakeGameModule : public BaseModule
+{
+    SnakeGame game;
+    RenderSnapshot2D rs;
+    void extract( RenderSnapshots2D& s) override
+    {
+        snake_extract(game.model, game.cell, rs, game.moved);
+        s.push_back(rs);
+    }
+
+    void tick(float dt, std::span<const EventData> in) override
+    {
+        game.tick(dt, in);
+    }
+};
+
+
 struct MyApp : EngineAppBase {
+
+    bool inMenu = false;
+    SnakeGameModule game;
+    BlinkMenu mainMenu; 
+    FrameRateCounterModule frc;
+
     bool onInit() override {
         eng.init(EngineConfig{800,600,"Snake Demo", "0.1","snake_demo", true});
         mainMenu.applyResolution(800,600);
-        mainMenu.init(&eventStack, &eng);
-        cb.step = [&](float dt, std::span<const EventData> in, RenderSnapshot2D& out){
-            game.step(dt, in, out);};
-        cb.render = [&](const RenderSnapshot2D& s)
-        {
-            submit_quads((SDL_Renderer*)eng.getRenderer(), s);
-        };
-        menuCb.step = [&](float dt, std::span<const EventData> in, RenderSnapshot2D& out)
-        {
-        };
-        menuCb.render = [&](const RenderSnapshot2D& s){
-            submit_quads((SDL_Renderer*)eng.getRenderer(), s);
-            mainMenu.run((SDL_Renderer*)eng.getRenderer());
-        };
-        eng.setCallbacks(cb);
         TTF_Font* font = TTF_OpenFont("assets/Arial.ttf", 12);
         if (!font) {
             std::cout << SDL_GetError() << std::endl;
         }
-        frc = FrameRateCounter((SDL_Renderer*)eng.getRenderer(), font);
+        frc.frc = FrameRateCounter((SDL_Renderer*)eng.getRenderer(), font);
+        game.drawOrder = 0;
+        game.updateOrder = 0;
+        mainMenu.drawOrder = 1;
+        mainMenu.updateOrder = 1;
+        mainMenu.renderEnabled = false;
+        frc.drawOrder = 2;
+        frc.updateOrder = 2;
+        frc.renderEnabled = false;
+        addModule(&game);
+        addModule(&mainMenu);
+        addModule(&frc);
         return true;
     }
 
     void onIterate(const std::span<const EventData>& acts) override {
-        frc.update();
+        frc.frc.update();
 
         for (auto& a: acts){
             if (a.action == Event::Back){
                 inMenu = !inMenu;
-                eng.setCallbacks(inMenu? menuCb : cb);
+                mainMenu.renderEnabled = inMenu;
+                game.iterateEnabled = !inMenu;
             }
             if (a.action == Event::FrameRateToggle){
-                if (mainMenu.frameRate) 
-                {
-                    menuCb.render = [&](const RenderSnapshot2D& s){
-                        submit_quads((SDL_Renderer*)eng.getRenderer(), s);
-                        mainMenu.run((SDL_Renderer*)eng.getRenderer());
-                        frc.render();
-                    };
-                    cb.render = [&](const RenderSnapshot2D& s){
-                        submit_quads((SDL_Renderer*)eng.getRenderer(), s);
-                        frc.render();
-                    };
-                }
-                else
-                {
-                    menuCb.render = [&](const RenderSnapshot2D& s){
-                        submit_quads((SDL_Renderer*)eng.getRenderer(), s);
-                        mainMenu.run((SDL_Renderer*)eng.getRenderer());
-                    };
-                    cb.render = [&](const RenderSnapshot2D& s){
-                        submit_quads((SDL_Renderer*)eng.getRenderer(), s);
-                    };
-                }
-                eng.setCallbacks(inMenu? menuCb : cb);
+                frc.renderEnabled = !frc.renderEnabled;
             }
         }
     }
-
-    bool inMenu = false;
-    SnakeGame game;
-    BlinkMenu mainMenu; 
-    GameCallbacks menuCb;
-    FrameRateCounter frc;
 };
 
 ENGINE_DEFINE_SDL_APP(MyApp)

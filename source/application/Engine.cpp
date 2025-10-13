@@ -70,19 +70,29 @@ void Engine::iterate(double dt, std::span<const EventData> actions) {
     }
 
 
-    if (callbacks.step) {
-        callbacks.step(dt, actions, renderSnapshot); // Placeholder call to step callback
+    if (callbacks.tick) {
+        callbacks.tick(dt, actions); // Placeholder call to step callback
     }
+
+    if (callbacks.extract)
+    {
+        callbacks.extract(renderSnapshots);
+    }
+    
     
     if (p_ && p_->ren) {
         SDL_SetRenderDrawColor(p_->ren, 255, 255, 255, 255);
         SDL_RenderClear(p_->ren);
-        if (callbacks.render)
+        for (auto& renderSnapshot : renderSnapshots)
         {
-            callbacks.render(renderSnapshot);
+            if (renderSnapshot.render)
+                renderSnapshot.render();
+            render(renderSnapshot);
         }
         SDL_RenderPresent(p_->ren);
     }
+
+    renderSnapshots.clear();
 }
 
 void* Engine::getRenderer() {
@@ -103,4 +113,24 @@ void Engine::toggleFullscreen()
     {
         correctDisplay();
     }*/
+}
+
+void Engine::render(const RenderSnapshot2D& rs)
+{
+    for (auto& q: rs.quads){
+        if (q.tex != 0)
+        {
+
+        }
+        else
+        {
+            float x = q.mvp[3][0], y = q.mvp[3][1];
+            float w = q.mvp[0][0], h = q.mvp[1][1];
+            SDL_FRect r{ x, y, w, h };
+            SDL_SetRenderDrawColor(p_->ren,
+                Uint8(q.color.r*255), Uint8(q.color.g*255),
+                Uint8(q.color.b*255), Uint8(q.color.a*255));
+            SDL_RenderFillRect(p_->ren, &r);
+        }
+    }
 }

@@ -5,6 +5,7 @@
 
 #include "Engine.hpp"
 #include "EventStack.hpp"
+#include "CoreTypes.hpp"
 
 void BlinkMenu::run(SDL_Renderer* renderer)
 {
@@ -36,7 +37,7 @@ void BlinkMenu::internals()
     // Title for the settings category
     ImGui::Text("Game Settings");
 
-    if (isInit)
+    if (isInitialized)
     {
         if (ImGui::Checkbox("Fullscreen", &engine->isFullscreen)) {
             eventStack->next.push_back({Event::FullscreenToggle, nullptr});
@@ -63,13 +64,6 @@ void BlinkMenu::internals()
     ImGui::End();
 }
 
-void BlinkMenu::init(EventStack* es, Engine* e) 
-{ eventStack = es; engine = e; 
-    if (es && engine) {
-        isInit = true;
-    }
-};
-
 void BlinkMenu::applyResolution(int x, int y)
 {
     layout.xyRatio = float(x) / float(y);
@@ -83,4 +77,14 @@ void BlinkMenu::addResolutions(const std::vector<std::pair<int,int>>& sizes)
     {
         validResolutions.push_back(std::to_string(res.first) + "x" + std::to_string(res.second));
     }
+}
+
+void BlinkMenu::extract( RenderSnapshots2D& s)
+{
+    RenderSnapshot2D rs;
+    rs.render = [this]()
+    {
+        this->run((SDL_Renderer*)this->engine->getRenderer());
+    };
+    s.push_back(rs);
 }
