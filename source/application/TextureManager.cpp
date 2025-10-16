@@ -98,12 +98,12 @@ glm::ivec2 TextureManager::getSize(TextureHandle handle) const {
     SDL_Texture* texture = static_cast<SDL_Texture*>(getTexture(handle));
     if (!texture) return {0, 0};
     
-    int w, h;
+    float w, h;
     if (SDL_GetTextureSize(texture, &w, &h) < 0) {
         return {0, 0};
     }
     
-    return {w, h};
+    return {(int)w, (int)h};
 }
 
 TextureHandle TextureManager::addTexture(SDL_Texture* texture) {
