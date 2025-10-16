@@ -17,6 +17,9 @@ void BaseModule::initialize(Engine* engine, EventStack* eventStack)
     this->engine = engine;
     this->eventStack = eventStack;
     this->isInitialized = true;
+    this->onInit();
 }
-
-
+void BaseModule::onInit()
+{
+    // default: do nothing
+}

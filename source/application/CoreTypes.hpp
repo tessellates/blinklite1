@@ -7,6 +7,7 @@
 #include <glm/vec4.hpp>
 #include <span>
 #include "Event.hpp"
+#include <functional>
 
 using TextureHandle = uint32_t;
 

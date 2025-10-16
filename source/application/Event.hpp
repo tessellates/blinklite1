@@ -10,4 +10,4 @@ struct EventData
 struct F1   { float v; };
 struct V2   { float x, y; };
 struct I2   { int   a, b; };
-struct Btn  { int   button; }; 
+struct Btn  { int   button; float x, y; }; 

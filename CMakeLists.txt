@@ -40,7 +40,7 @@ add_subdirectory(extern)
 add_subdirectory(source) 
 
 # staging -- these are test executables to run
-option(BUILD_STAGING "Build staging" ON)
+option(BUILD_STAGING "Build staging" OFF)
 if(BUILD_STAGING)
     add_subdirectory(staging) 
 endif()

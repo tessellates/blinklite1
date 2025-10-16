@@ -13,4 +13,6 @@ target_sources(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/GameClock.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/EventStack.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/FrameRateCounter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/QuadRenderer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/TextureManager.cpp
 )

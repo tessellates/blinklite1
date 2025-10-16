@@ -11,6 +11,7 @@ struct BaseModule {
     virtual void tick(float dt, std::span<const EventData> ev);
     virtual void extract( RenderSnapshots2D& s);
     virtual void initialize(Engine* engine, EventStack* eventStack);
+    virtual void onInit();
     bool iterateEnabled = true;
     bool renderEnabled = true;
     EventStack* eventStack = nullptr;
