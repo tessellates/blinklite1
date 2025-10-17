@@ -7,7 +7,14 @@ struct EventData
     const void*  data; 
 };
 
+enum MouseButton
+{
+    LEFT   = 0,
+    MIDDLE = 1,
+    RIGHT  = 2
+};
+
 struct F1   { float v; };
 struct V2   { float x, y; };
 struct I2   { int   a, b; };
-struct Btn  { int   button; float x, y; }; 
+struct Btn  { MouseButton button; float x, y; }; 

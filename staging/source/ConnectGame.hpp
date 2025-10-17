@@ -15,7 +15,7 @@ public:
 
     void tick(float dt, std::span<const EventData> ev) override;
     void extract(RenderSnapshots2D& snapshots) override;
-    void initialize(Engine* engine, EventStack* eventStack) override;
+    void initialize(Engine* engine, EventStack* eventStack);
     void onInit() override;
 
 private:

@@ -4,22 +4,13 @@
 
 ConnectGame::ConnectGame() {}
 
-void ConnectGame::initialize(Engine* engine, EventStack* eventStack) {
-    BaseModule::initialize(engine, eventStack);
-    
+void ConnectGame::onInit() {
     gui = std::make_unique<ConnectGui>(*engine);
-    whitePixelTexture = engine->createWhitePixelTexture();
     setupGrid();
     setupBoard();
 }
 
-void ConnectGame::onInit() {
-    std::cout << "ConnectGame: Initialized successfully" << std::endl;
-}
-
-void ConnectGame::tick(float dt, std::span<const EventData> events) {
-    if (!iterateEnabled) return;
-    
+void ConnectGame::tick(float dt, std::span<const EventData> events) {    
     // Handle events
     for (const auto& event : events) {
         if (gameOver) {
@@ -36,16 +27,11 @@ void ConnectGame::tick(float dt, std::span<const EventData> events) {
     updateGameVisuals();
 }
 
-void ConnectGame::extract(RenderSnapshots2D& snapshots) {
-    if (!renderEnabled) return;
-    
-    RenderSnapshot2D snapshot;
-    snapshot.cam = {}; // Use default camera
-    
+void ConnectGame::extract(RenderSnapshots2D& snapshots) {    
+    RenderSnapshot2D snapshot;    
     renderBoard(snapshot);
     gui->render(snapshot);
     renderUI(snapshot);
-    
     snapshots.push_back(std::move(snapshot));
 }
 
@@ -75,10 +61,10 @@ void ConnectGame::setupBoard() {
 
 void ConnectGame::handleInput(const EventData& event) {
     switch (event.type) {
-        case EventType::MouseMove: {
+        case EventType::MousePos: {
             glm::vec2 boardPos = getBoardPosition();
-            float mouseX = static_cast<float>(event.mouse.x);
-            float relativeX = mouseX - boardPos.x;
+            V2 mousePos = static_cast<V2>(event.data);
+            float relativeX = mousePos.x - boardPos.x;
             
             int newHoveredColumn = -1;
             if (relativeX >= 0 && relativeX < ConnectModel::COLS * CELL_SIZE) {
@@ -98,7 +84,7 @@ void ConnectGame::handleInput(const EventData& event) {
             }
             break;
         }
-        
+        /*
         case EventType::KeyDown: {
             if (event.keyboard.key >= KeyCode::Num1 && event.keyboard.key <= KeyCode::Num7) {
                 int column = static_cast<int>(event.keyboard.key) - static_cast<int>(KeyCode::Num1);
@@ -109,7 +95,9 @@ void ConnectGame::handleInput(const EventData& event) {
                 resetGame();
             }
             break;
-        }
+        }*/
+       case default:
+            break;
     }
 }
 

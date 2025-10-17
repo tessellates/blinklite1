@@ -51,11 +51,11 @@ struct SdlTranslator {
             break;
 
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
-            stack.out.push_back({Event::MouseDown, stack.push(Btn{ e.button.button, e.button.x, e.button.y })});
+            stack.out.push_back({Event::MouseDown, stack.push(Btn{ static_cast<MouseButton>(e.button.button), e.button.x, e.button.y })});
             break;
 
         case SDL_EVENT_MOUSE_BUTTON_UP:
-            stack.out.push_back({Event::MouseUp, stack.push(Btn{ e.button.button, e.button.x, e.button.y })});
+            stack.out.push_back({Event::MouseUp, stack.push(Btn{ static_cast<MouseButton>(e.button.button), e.button.x, e.button.y })});
             break;
 
         case SDL_EVENT_GAMEPAD_BUTTON_DOWN:

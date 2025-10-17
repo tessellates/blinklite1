@@ -29,4 +29,6 @@ public:
 
     std::vector<std::stack<int>> board;
     std::optional<std::vector<Coordinate>> win;
+    static constexpr int ROWS = 6;
+    static constexpr int COLS = 7;
 };
