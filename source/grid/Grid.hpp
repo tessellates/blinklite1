@@ -15,7 +15,7 @@ struct Grid
     float csize;
 
     Grid() = default;
-    Grid(const Rect& rect, int nx, int ny) : rect(rect), nx(nx), ny(ny)
+    Grid(const glm::ivec4& rect, int nx, int ny) : rect(rect), nx(nx), ny(ny)
     {
         xsize = (float)(rect.z)/nx;
         ysize = (float)(rect.w)/ny;

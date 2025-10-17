@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "source/application/sdl_base_app.hpp"
-#include "source/application/Engine.hpp"
-#include "source/ConnectGame.hpp"
+#include <sdl_base_app.hpp>
+#include <Engine.hpp>
+#include <ConnectGame.hpp>
 #include <memory>
 
 int main() {

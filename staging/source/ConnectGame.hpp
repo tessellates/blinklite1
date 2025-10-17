@@ -1,8 +1,8 @@
 #pragma once
 #include "ConnectModel.hpp"
-#include "../../source/application/BaseModule.hpp"
-#include "../../source/application/Engine.hpp"
-#include "../../source/application/CoreTypes.hpp"
+#include <BaseModule.hpp>
+#include <Engine.hpp>
+#include <CoreTypes.hpp>
 #include <glm/glm.hpp>
 
 class ConnectGame : public BaseModule {

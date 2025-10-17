@@ -12,7 +12,7 @@ add_executable(connect4 main.cpp)
 add_subdirectory(source)
 
 # Link the library
-target_link_libraries(connect4 ${BLINKLIB})
+target_link_libraries(connect4 blinklite)
 
 add_compile_definitions(IMGUI_DEFINE_MATH_OPERATORS)
 

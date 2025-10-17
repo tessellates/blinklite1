@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Coordinate.hpp"
+#include <Coordinate.hpp>
 #include <stack>
-#include "CommandHistory.hpp"
-#include "Direction.hpp"
-#include <optional>
+#include <vector>
+#include <CommandHistory.hpp>
+
 
 class ConnectModel : public CommandHistory
 {

@@ -91,14 +91,4 @@ private:
     };
 };
 
-// Hash specialization for Coordinate to work with unordered_map
-namespace std {
-    template<>
-    struct hash<Coordinate> {
-        size_t operator()(const Coordinate& coord) const {
-            return hash<int>()(coord.x) ^ (hash<int>()(coord.y) << 1);
-        }
-    };
-}
-
 

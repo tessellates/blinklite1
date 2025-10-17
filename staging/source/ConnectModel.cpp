@@ -2,6 +2,7 @@
 #include "Command.hpp"
 #include <algorithm> // For std::find
 #include <random>
+#include <assert.h>
 
 void printBoard(const std::vector<std::stack<int>>& board)
 {
