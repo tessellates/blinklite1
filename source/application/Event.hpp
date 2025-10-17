@@ -9,9 +9,9 @@ struct EventData
 
 enum MouseButton
 {
-    LEFT   = 0,
-    MIDDLE = 1,
-    RIGHT  = 2
+    MOUSE_LEFT   = 0,
+    MOUSE_MIDDLE = 1,
+    MOUSE_RIGHT  = 2
 };
 
 struct F1   { float v; };

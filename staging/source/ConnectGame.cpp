@@ -1,5 +1,7 @@
 #include "ConnectGame.hpp"
 #include <iostream>
+#include <glm/ext/matrix_transform.hpp>
+
 
 ConnectGame::ConnectGame() {}
 
@@ -27,9 +29,9 @@ void ConnectGame::tick(float dt, std::span<const EventData> events) {
     // Handle events
     for (const auto& event : events) {
         if (model.gameOver) {
-            if (event.type == EventType::KeyDown && event.keyboard.key == KeyCode::R) {
-                resetGame();
-            }
+            //if (event.type == EventType::KeyDown && event.keyboard.key == KeyCode::R) {
+            //    resetGame();
+            //}
             continue;
         }
         handleInput(event);
@@ -52,8 +54,8 @@ void ConnectGame::setupGrid() {
     gameGrid.xsize = CELL_SIZE;
     gameGrid.ysize = CELL_SIZE;
     glm::vec2 boardPos = getBoardPosition();
-    gameGrid.offsetX = boardPos.x;
-    gameGrid.offsetY = boardPos.y;
+    //gameGrid.offsetX = boardPos.x;
+    //gameGrid.offsetY = boardPos.y;
     gui->init(gameGrid);
 }
 
@@ -63,11 +65,11 @@ void ConnectGame::setupBoard() {
 }
 
 void ConnectGame::handleInput(const EventData& event) {
-    switch (event.type) {
-        case EventType::MousePos: {
+    switch (event.action) {
+        case Event::MousePos: {
             glm::vec2 boardPos = getBoardPosition();
-            V2 mousePos = static_cast<V2>(event.data);
-            float relativeX = mousePos.x - boardPos.x;
+            float mouseX = static_cast<const V2*>(event.data)->x;
+            float relativeX = mouseX - boardPos.x;
             
             int newHoveredColumn = -1;
             if (relativeX >= 0 && relativeX < ConnectModel::COLS * CELL_SIZE) {
@@ -81,7 +83,7 @@ void ConnectGame::handleInput(const EventData& event) {
             break;
         }
         
-        case EventType::MouseButtonDown: {
+        case Event::MouseDown: {
             if (hoveredColumn >= 0) {
                 makeMove(hoveredColumn);
             }

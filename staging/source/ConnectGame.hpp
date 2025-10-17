@@ -2,6 +2,7 @@
 #include "ConnectModel.hpp"
 #include "ConnectGui.hpp"
 #include <BaseModule.hpp>
+#include <Event.hpp>
 #include <Engine.hpp>
 #include <CoreTypes.hpp>
 #include <Grid.hpp>

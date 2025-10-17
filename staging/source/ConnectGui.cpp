@@ -6,6 +6,7 @@
 #include "ConnectGui.hpp"
 #include <algorithm>
 #include <cmath>
+#include <glm/ext/matrix_transform.hpp> 
 
 ConnectGui::ConnectGui(Engine& engine) : engine(engine) {
     // No texture needed anymore
