@@ -26,24 +26,19 @@ private:
     void updateGameVisuals();
     void makeMove(int column);
     void resetGame();
-    void checkWinCondition();
-    void syncGuiWithModel();
     
     // Helper to add rectangle as QuadCmd
     void addRectQuad(RenderSnapshot2D& snapshot, glm::vec4 rect, glm::vec4 color);
     
     glm::vec2 getBoardPosition() const;
-    glm::vec4 getPlayerColor(ConnectModel::Player player) const;
+    glm::vec4 getPlayerColor(int player) const;
     
 private:
     ConnectModel model;
     std::unique_ptr<ConnectGui> gui;
     Grid gameGrid;
-    TextureHandle whitePixelTexture;
     
     int hoveredColumn = -1;
-    bool gameOver = false;
-    ConnectModel::Player winner = ConnectModel::Player::None;
     
     static constexpr float BOARD_MARGIN = 50.0f;
     static constexpr float CELL_SIZE = 60.0f;
