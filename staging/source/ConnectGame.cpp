@@ -1,5 +1,4 @@
 #include "ConnectGame.hpp"
-#include <ShapeRenderer.hpp>
 #include <iostream>
 
 ConnectGame::ConnectGame() {}
@@ -79,24 +78,13 @@ void ConnectGame::handleInput(const EventData& event) {
         }
         
         case EventType::MouseButtonDown: {
-            if (event.mouse.button == MouseButton::Left && hoveredColumn >= 0) {
+            if (hoveredColumn >= 0) {
                 makeMove(hoveredColumn);
             }
             break;
         }
-        /*
-        case EventType::KeyDown: {
-            if (event.keyboard.key >= KeyCode::Num1 && event.keyboard.key <= KeyCode::Num7) {
-                int column = static_cast<int>(event.keyboard.key) - static_cast<int>(KeyCode::Num1);
-                if (column < ConnectModel::COLS) {
-                    makeMove(column);
-                }
-            } else if (event.keyboard.key == KeyCode::R) {
-                resetGame();
-            }
-            break;
-        }*/
-       case default:
+        
+        default:
             break;
     }
 }
@@ -105,11 +93,10 @@ void ConnectGame::renderBoard(RenderSnapshot2D& snapshot) {
     glm::vec2 boardPos = getBoardPosition();
     glm::vec2 boardSize = {ConnectModel::COLS * CELL_SIZE, ConnectModel::ROWS * CELL_SIZE};
     
-    ShapeRenderer shapeRenderer(*engine, whitePixelTexture);
+    // Board background
+    addRectQuad(snapshot, {boardPos.x - 10, boardPos.y - 10, boardSize.x + 20, boardSize.y + 20}, BOARD_COLOR);
     
-    glm::vec4 boardRect = {boardPos.x - 10, boardPos.y - 10, boardSize.x + 20, boardSize.y + 20};
-    shapeRenderer.addRect(snapshot, boardRect, BOARD_COLOR);
-    
+    // Grid cells
     for (int row = 0; row < ConnectModel::ROWS; ++row) {
         for (int col = 0; col < ConnectModel::COLS; ++col) {
             glm::vec2 cellPos = {boardPos.x + col * CELL_SIZE, boardPos.y + row * CELL_SIZE};
@@ -120,14 +107,12 @@ void ConnectGame::renderBoard(RenderSnapshot2D& snapshot) {
                 cellColor = HOVER_COLOR;
             }
             
-            shapeRenderer.addRect(snapshot, cellRect, cellColor);
+            addRectQuad(snapshot, cellRect, cellColor);
         }
     }
 }
 
 void ConnectGame::renderUI(RenderSnapshot2D& snapshot) {
-    ShapeRenderer shapeRenderer(*engine, whitePixelTexture);
-    
     glm::vec2 boardPos = getBoardPosition();
     glm::vec4 statusRect = {boardPos.x, boardPos.y - 40, 300, 30};
     
@@ -141,7 +126,26 @@ void ConnectGame::renderUI(RenderSnapshot2D& snapshot) {
         statusColor.a = 0.6f;
     }
     
-    shapeRenderer.addRect(snapshot, statusRect, statusColor);
+    addRectQuad(snapshot, statusRect, statusColor);
+}
+
+void ConnectGame::addRectQuad(RenderSnapshot2D& snapshot, glm::vec4 rect, glm::vec4 color) {
+    QuadCmd quad;
+    quad.tex = 0; // No texture - solid color
+    quad.color = color;
+    quad.sortKey = 0;
+    
+    glm::mat4 transform = glm::mat4(1.0f);
+    transform = glm::translate(transform, glm::vec3(rect.x, rect.y, 0.0f));
+    transform = glm::scale(transform, glm::vec3(rect.z, rect.w, 1.0f));
+    
+    glm::mat4 projection = glm::mat4(1.0f);
+    glm::mat4 view = glm::mat4(1.0f);
+    
+    quad.mvp = projection * view * transform;
+    quad.uv = glm::vec4(0, 0, 1, 1);
+    
+    snapshot.quads.push_back(quad);
 }
 
 void ConnectGame::updateGameVisuals() {

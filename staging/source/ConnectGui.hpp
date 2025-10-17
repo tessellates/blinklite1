@@ -13,13 +13,6 @@
 #include <unordered_map>
 #include <memory>
 
-// Forward declarations
-class ShapeRenderer;
-
-/**
- * ConnectGui - Handles visual representation of Connect4 pieces
- * Refactored to use the new BlinkLite engine architecture
- */
 class ConnectGui {
 public:
     struct PieceEntity {
@@ -29,65 +22,45 @@ public:
         int color;
         bool isAnimating = false;
         float animationTime = 0.0f;
-        float animationDuration = 0.75f; // 750ms like original
+        float animationDuration = 0.75f;
         bool isPreview = false;
     };
 
     explicit ConnectGui(Engine& engine);
     ~ConnectGui() = default;
 
-    // Core functionality
     void init(const Grid& grid);
     void update(double deltaTime);
     void render(RenderSnapshot2D& snapshot);
 
-    // Entity management
     void addConnectEntity(const Coordinate& position, int color);
     void removeConnectEntity(const Coordinate& position);
     void changeConnectEntity(const Coordinate& position, int color);
 
-    // Preview mode for hover effects
     void setPreviewMode(bool enabled) { previewMode = enabled; }
     bool isPreviewMode() const { return previewMode; }
 
-    // Animation control
-    void setAnimationDuration(float duration) { defaultAnimationDuration = duration; }
-
 private:
-    // Helper methods
     glm::vec2 gridToWorldPosition(const Coordinate& coord) const;
     glm::vec4 getPieceColor(int colorId, bool isPreview) const;
     void updateAnimations(double deltaTime);
     void renderPiece(RenderSnapshot2D& snapshot, const PieceEntity& piece, const Coordinate& coord);
+    void addCircleQuad(RenderSnapshot2D& snapshot, glm::vec2 center, float radius, glm::vec4 color, uint32_t sortKey);
 
 private:
     Engine& engine;
     Grid grid;
-    
-    // Entity storage - using Coordinate as key
     std::unordered_map<Coordinate, PieceEntity> pieces;
-    
-    // Rendering resources
-    TextureHandle whitePixelTexture;
-    std::unique_ptr<ShapeRenderer> shapeRenderer;
-    
-    // Settings
     bool previewMode = false;
-    float defaultAnimationDuration = 0.75f;
     
-    // Visual constants
-    static constexpr float PIECE_RADIUS_RATIO = 0.4f; // Piece size relative to grid cell
-    static constexpr int LAYER_NORMAL = 1;
-    static constexpr int LAYER_PREVIEW = 2;
-    
-    // Colors matching your original system (1+color, +3 for preview)
+    static constexpr float PIECE_RADIUS_RATIO = 0.4f;
     static constexpr glm::vec4 COLORS[6] = {
-        {1.0f, 0.2f, 0.2f, 1.0f}, // Color 0 (Red)
-        {1.0f, 1.0f, 0.2f, 1.0f}, // Color 1 (Yellow)  
-        {0.2f, 0.2f, 1.0f, 1.0f}, // Color 2 (Blue)
-        {1.0f, 0.4f, 0.4f, 0.7f}, // Color 0 Preview (Light Red)
-        {1.0f, 1.0f, 0.4f, 0.7f}, // Color 1 Preview (Light Yellow)
-        {0.4f, 0.4f, 1.0f, 0.7f}  // Color 2 Preview (Light Blue)
+        {1.0f, 0.2f, 0.2f, 1.0f}, // Red
+        {1.0f, 1.0f, 0.2f, 1.0f}, // Yellow  
+        {0.2f, 0.2f, 1.0f, 1.0f}, // Blue
+        {1.0f, 0.4f, 0.4f, 0.7f}, // Red Preview
+        {1.0f, 1.0f, 0.4f, 0.7f}, // Yellow Preview
+        {0.4f, 0.4f, 1.0f, 0.7f}  // Blue Preview
     };
 };
 

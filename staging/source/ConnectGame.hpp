@@ -15,7 +15,6 @@ public:
 
     void tick(float dt, std::span<const EventData> ev) override;
     void extract(RenderSnapshots2D& snapshots) override;
-    void initialize(Engine* engine, EventStack* eventStack);
     void onInit() override;
 
 private:
@@ -29,6 +28,9 @@ private:
     void resetGame();
     void checkWinCondition();
     void syncGuiWithModel();
+    
+    // Helper to add rectangle as QuadCmd
+    void addRectQuad(RenderSnapshot2D& snapshot, glm::vec4 rect, glm::vec4 color);
     
     glm::vec2 getBoardPosition() const;
     glm::vec4 getPlayerColor(ConnectModel::Player player) const;
