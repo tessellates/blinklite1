@@ -7,8 +7,9 @@
 #include <cstdint>
 #include <cstring>
 #include <iostream>
+#include "Singleton.hpp"
 
-struct EventStack {
+struct EventStack : public Singleton<EventStack> {
     std::vector<EventData> out;
     std::vector<EventData> next;
     std::vector<std::byte> arena;

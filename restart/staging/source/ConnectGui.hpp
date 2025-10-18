@@ -11,6 +11,7 @@
 #include <Engine.hpp>
 #include <glm/glm.hpp>
 #include <unordered_map>
+#include "ConnectModel.hpp"
 #include <memory>
 
 class ConnectGui {
@@ -26,12 +27,14 @@ public:
         bool isPreview = false;
     };
 
-    explicit ConnectGui(Engine& engine);
+    explicit ConnectGui();
     ~ConnectGui() = default;
 
     void init(const Grid& grid);
     void update(double deltaTime);
     void render(RenderSnapshot2D& snapshot);
+    void renderUI(RenderSnapshot2D& snapshot);
+    void renderBoard(RenderSnapshot2D& snapshot);
 
     void addConnectEntity(const Coordinate& position, int color);
     void removeConnectEntity(const Coordinate& position);
@@ -39,17 +42,19 @@ public:
 
     void setPreviewMode(bool enabled) { previewMode = enabled; }
     bool isPreviewMode() const { return previewMode; }
+    void addRectQuad(RenderSnapshot2D& snapshot, glm::vec4 rect, glm::vec4 color);
+
+    glm::vec2 boardPos{0,0};
 
 private:
-    glm::vec2 gridToWorldPosition(const Coordinate& coord) const;
     glm::vec4 getPieceColor(int colorId, bool isPreview) const;
     void updateAnimations(double deltaTime);
     void renderPiece(RenderSnapshot2D& snapshot, const PieceEntity& piece, const Coordinate& coord);
     void addCircleQuad(RenderSnapshot2D& snapshot, glm::vec2 center, float radius, glm::vec4 color, uint32_t sortKey);
 
 private:
-    Engine& engine;
     Grid grid;
+
     std::unordered_map<Coordinate, PieceEntity> pieces;
     bool previewMode = false;
     
@@ -62,6 +67,9 @@ private:
         {1.0f, 1.0f, 0.4f, 0.7f}, // Yellow Preview
         {0.4f, 0.4f, 1.0f, 0.7f}  // Blue Preview
     };
+    static constexpr glm::vec4 BOARD_COLOR = {0.2f, 0.4f, 0.8f, 1.0f};
+    static constexpr glm::vec4 EMPTY_CELL_COLOR = {0.9f, 0.9f, 0.9f, 1.0f};
+    static constexpr glm::vec4 HOVER_COLOR = {0.8f, 0.8f, 0.8f, 0.5f};
 };
 
 

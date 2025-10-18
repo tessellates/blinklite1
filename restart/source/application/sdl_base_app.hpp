@@ -10,9 +10,10 @@
 #include "EventStack.hpp"
 #include "imgui_impl_sdl3.h"
 #include "BaseModule.hpp"
+#include "EventStack.hpp"
 
 struct EngineAppBase {
-    Engine eng; SdlTranslator xlat; GameCallbacks cb; EventStack eventStack;
+    SdlTranslator xlat; GameCallbacks cb;
     GameClock clock{1.0f/120.0f};
 
     std::vector<BaseModule*> upd, draw;
@@ -30,7 +31,7 @@ struct EngineAppBase {
 
     void addModule(BaseModule* m)
     {
-        m->initialize(&eng, &eventStack);
+        m->initialize();
         upd.push_back(m);
         draw.push_back(m);
     }
@@ -51,7 +52,7 @@ struct EngineAppBase {
         {
             for (auto m: draw) if (m->renderEnabled) m->extract(s);
         };
-        eng.setCallbacks(cb);
+        Engine::instance()->setCallbacks(cb);
     }
 
 
@@ -59,15 +60,15 @@ struct EngineAppBase {
 
     void onEvent(const SDL_Event& e){ 
         ImGui_ImplSDL3_ProcessEvent(&e); 
-        xlat.on_event(e, eventStack); }
+        xlat.on_event(e, *EventStack::instance()); }
 
     void iterate()
     {
-        const auto& acts = eventStack.flush();
+        const auto& acts = EventStack::instance()->flush();
         onIterate(acts);
         clock.update();
-        eng.iterate(clock.getDeltaTime(), std::span<const EventData>(acts.data(), acts.size()));
-        eventStack.reset();
+        Engine::instance()->iterate(clock.getDeltaTime(), std::span<const EventData>(acts.data(), acts.size()));
+        EventStack::instance()->reset();
     }
-    void shutdown(int code){ eng.quit(); onShutdown(code); }
+    void shutdown(int code){ Engine::instance()->quit(); onShutdown(code); }
 };

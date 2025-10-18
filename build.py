@@ -200,7 +200,7 @@ def run_application() -> None:
         if platform.system() == 'Windows':
             executable_path = os.path.join(BUILD_DIR, 'bin', DEFAULT_BUILD_TYPE, 'main.exe')
         else:
-            executable_path = os.path.join('.', BUILD_DIR, 'bin', 'connect4')
+            executable_path = os.path.join('.', BUILD_DIR, 'bin', 'main')
             
         if not os.path.exists(executable_path):
             raise BuildError(f"Executable not found: {executable_path}")

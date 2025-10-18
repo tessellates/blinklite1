@@ -3,7 +3,6 @@
 #include "sdl_base_app.hpp"
 #include "sdl_engine_entry.hpp"
 #include "snake_model.hpp"
-#include "snake_render.hpp"
 #include <BlinkMenu.hpp>
 #include <FrameRateCounter.hpp>
 #include <filesystem>
@@ -29,7 +28,7 @@ struct SnakeGameModule : public BaseModule
     RenderSnapshot2D rs;
     void extract( RenderSnapshots2D& s) override
     {
-        snake_extract(game.model, game.cell, rs, game.moved);
+        snake_extract(game.model, game.context, rs, game.moved);
         s.push_back(rs);
     }
 
@@ -48,13 +47,13 @@ struct MyApp : EngineAppBase {
     FrameRateCounterModule frc;
 
     bool onInit() override {
-        eng.init(EngineConfig{800,600,"Snake Demo", "0.1","snake_demo", true});
+        Engine::instance()->init(EngineConfig{800,600,"Snake Demo", "0.1","snake_demo", true});
         mainMenu.applyResolution(800,600);
         TTF_Font* font = TTF_OpenFont("assets/Arial.ttf", 12);
         if (!font) {
             std::cout << SDL_GetError() << std::endl;
         }
-        frc.frc = FrameRateCounter((SDL_Renderer*)eng.getRenderer(), font);
+        frc.frc = FrameRateCounter((SDL_Renderer*)Engine::instance()->getRenderer(), font);
         game.drawOrder = 0;
         game.updateOrder = 0;
         mainMenu.drawOrder = 1;
@@ -80,6 +79,11 @@ struct MyApp : EngineAppBase {
             }
             if (a.action == Event::FrameRateToggle){
                 frc.renderEnabled = !frc.renderEnabled;
+            }
+            if (a.action == Event::WindowResized)
+            {
+                mainMenu.applyResolution(Engine::instance()->getWindowSize().x, Engine::instance()->getWindowSize().y);
+                game.game.context = SnakeContext{ {16,12,1}, (float)Engine::instance()->getWindowSize().x, (float)Engine::instance()->getWindowSize().y };
             }
         }
     }

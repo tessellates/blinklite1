@@ -22,14 +22,11 @@ private:
     void setupBoard();
     void setupGrid();
     void handleInput(const EventData& event);
-    void renderBoard(RenderSnapshot2D& snapshot);
-    void renderUI(RenderSnapshot2D& snapshot);
     void updateGameVisuals();
     void makeMove(int column);
+    void hover(int column);
+    int getColumnFromMouseX(float mouseX) const;
     void resetGame();
-    
-    // Helper to add rectangle as QuadCmd
-    void addRectQuad(RenderSnapshot2D& snapshot, glm::vec4 rect, glm::vec4 color);
     
     glm::vec2 getBoardPosition() const;
     glm::vec4 getPlayerColor(int player) const;

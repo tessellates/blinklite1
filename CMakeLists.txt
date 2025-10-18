@@ -42,7 +42,7 @@ add_subdirectory(source)
 # staging -- these are test executables to run
 option(BUILD_STAGING "Build staging" ON)
 if(BUILD_STAGING)
-    add_subdirectory(staging) 
+    #add_subdirectory(staging) 
 endif()
 
 set(BLINKLIB ${PROJECT_NAME})

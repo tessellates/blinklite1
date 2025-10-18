@@ -31,13 +31,13 @@ struct MyApp : EngineAppBase {
     FrameRateCounterModule frc;
 
     bool onInit() override {
-        eng.init(EngineConfig{800,600,"Connect Demo", "0.1","snake_demo", true});
+        Engine::instance()->init(EngineConfig{800,600,"Connect Demo", "0.1","snake_demo", true});
         mainMenu.applyResolution(800,600);
         TTF_Font* font = TTF_OpenFont("assets/Arial.ttf", 12);
         if (!font) {
             std::cout << SDL_GetError() << std::endl;
         }
-        frc.frc = FrameRateCounter((SDL_Renderer*)eng.getRenderer(), font);
+        frc.frc = FrameRateCounter((SDL_Renderer*)Engine::instance()->getRenderer(), font);
         game.drawOrder = 0;
         game.updateOrder = 0;
         mainMenu.drawOrder = 1;

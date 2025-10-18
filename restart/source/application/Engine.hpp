@@ -4,22 +4,17 @@
 #include "CoreTypes.hpp"
 #include "Event.hpp" 
 #include <span>
+#include "Singleton.hpp"
 
-// Forward declarations - no SDL in headers!
 class TextureManager;
 class QuadRenderer;
 
-/**
- * FIXED ENGINE - Proper separation of concerns
- */
-class Engine {
+class Engine : public Singleton<Engine>{
+    friend class Singleton<Engine>;
 public:
-    Engine();
-    ~Engine();
-    
-    // Non-copyable
-    Engine(const Engine&) = delete;
-    Engine& operator=(const Engine&) = delete;
+    // boiler-plate singleton
+    Engine(Engine &other) = delete;
+    void operator=(const Engine &) = delete;
     
     bool init(const EngineConfig& config);
     void quit();
@@ -27,6 +22,8 @@ public:
     
     void setCallbacks(const GameCallbacks& callbacks) { this->callbacks = callbacks; }
     void toggleFullscreen();
+
+    glm::ivec2 getWindowSize() const;
     
     // Resource management
     TextureHandle loadBMPTexture(const char* path);
@@ -38,6 +35,9 @@ public:
     bool isFullscreen = false;
     
 private:
+    Engine();
+    ~Engine();
+
     void render(const RenderSnapshot2D& snapshot);
     void handleEngineEvents(std::span<const EventData> events);
     

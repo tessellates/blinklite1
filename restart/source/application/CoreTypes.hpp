@@ -23,6 +23,12 @@ struct QuadCmd {
     uint32_t   sortKey{};      // layer/material for batching
 };
 
+struct RectCmd 
+{
+    TextureHandle tex{};
+    glm::vec4 color{1,1,1,1};
+};
+
 struct RenderSnapshot2D {
     OrthoCamera cam;
     std::vector<QuadCmd> quads;

@@ -1,4 +1,5 @@
 #include "Engine.hpp"
+#include "EventStack.hpp"
 #include "TextureManager.hpp"
 #include "QuadRenderer.hpp"
 #include "Event.hpp"
@@ -109,7 +110,6 @@ void Engine::quit() {
 
 void Engine::iterate(double dt, std::span<const EventData> events) {
     if (!pimpl || !pimpl->running) return;
-    
     // Handle engine-specific events
     handleEngineEvents(events);
     
@@ -165,6 +165,8 @@ void Engine::toggleFullscreen() {
     
     SDL_SetWindowFullscreen(pimpl->window, currentlyFullscreen ? 0 : SDL_WINDOW_FULLSCREEN);
     isFullscreen = !currentlyFullscreen;
+
+    EventStack::instance()->next.push_back({Event::WindowResized, nullptr});
 }
 
 TextureHandle Engine::loadBMPTexture(const char* path) {
@@ -177,4 +179,15 @@ TextureHandle Engine::loadBMPTextureWithKey(const char* path, const glm::ivec3& 
 
 void* Engine::getRenderer() {
     return pimpl ? static_cast<void*>(pimpl->renderer) : nullptr;
+}
+
+glm::ivec2 Engine::getWindowSize() const {
+    if (pimpl && pimpl->window) {
+        int w, h;
+        SDL_GetWindowSize(pimpl->window, &w, &h);
+        std::cout << w << std::endl;
+        std::cout << h << std::endl;
+        return glm::ivec2(w, h);
+    }
+    return glm::ivec2(0, 0);
 }

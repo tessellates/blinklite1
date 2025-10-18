@@ -14,10 +14,11 @@ QuadRenderer::QuadRenderer(void* sdlRenderer, TextureManager& texManager)
 void QuadRenderer::render(const RenderSnapshot2D& snapshot) {
     // Sort quads by sort key for proper layering and batching
     auto sortedQuads = snapshot.quads;
+    /*
     std::sort(sortedQuads.begin(), sortedQuads.end(), 
               [](const QuadCmd& a, const QuadCmd& b) {
                   return a.sortKey < b.sortKey;
-              });
+              });*/
     
     // Render each quad
     for (const auto& quad : sortedQuads) {

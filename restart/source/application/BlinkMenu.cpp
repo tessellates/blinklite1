@@ -39,15 +39,15 @@ void BlinkMenu::internals()
 
     if (isInitialized)
     {
-        if (ImGui::Checkbox("Fullscreen", &engine->isFullscreen)) {
-            eventStack->next.push_back({Event::FullscreenToggle, nullptr});
+        if (ImGui::Checkbox("Fullscreen", &Engine::instance()->isFullscreen)) {
+            EventStack::instance()->next.push_back({Event::FullscreenToggle, nullptr});
         }
     }
 
     // Fullscreen toggle
     if (ImGui::Checkbox("Framerate", &this->frameRate)) 
     {
-        eventStack->next.push_back({Event::FrameRateToggle, nullptr});
+        EventStack::instance()->next.push_back({Event::FrameRateToggle, nullptr});
     }
     /*
     // V-Sync toggle
@@ -84,7 +84,7 @@ void BlinkMenu::extract( RenderSnapshots2D& s)
     RenderSnapshot2D rs;
     rs.render = [this]()
     {
-        this->run((SDL_Renderer*)this->engine->getRenderer());
+        this->run((SDL_Renderer*)Engine::instance()->getRenderer());
     };
     s.push_back(rs);
 }

@@ -12,10 +12,8 @@ void BaseModule::extract( RenderSnapshots2D& s)
 {
     // default: do nothing
 }
-void BaseModule::initialize(Engine* engine, EventStack* eventStack)
+void BaseModule::initialize()
 {
-    this->engine = engine;
-    this->eventStack = eventStack;
     this->isInitialized = true;
     this->onInit();
 }
