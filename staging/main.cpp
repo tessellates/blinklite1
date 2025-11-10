@@ -14,7 +14,7 @@ struct FrameRateCounterModule : public BaseModule
     void extract( RenderSnapshots2D& s) override
     {
     RenderSnapshot2D rs;
-    rs.render = [this]()
+    rs.customRender = [this]()
     {
         frc.render();
     };

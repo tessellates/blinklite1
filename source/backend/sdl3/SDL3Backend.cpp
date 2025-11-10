@@ -3,13 +3,16 @@
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <iostream>
-#include "sdl_image_utils.hpp"
 #include <glm/gtc/matrix_transform.hpp>
+#include "EventStack.hpp"
+#include "imgui.h"
+#include "imgui_impl_sdl3.h"
+#include "imgui_impl_sdlrenderer3.h"
 
 SDL3Backend::SDL3Backend() = default;
 
 SDL3Backend::~SDL3Backend() {
-    shutdownImpl();
+    //shutdownImpl();
 }
 
 bool SDL3Backend::initImpl(const EngineConfig& config) {
@@ -26,9 +29,7 @@ bool SDL3Backend::initImpl(const EngineConfig& config) {
         SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
         return false;
     }
-    
-    InitImageLoader();
-    
+        
     // Initialize texture manager
     try {
         textureManager = std::make_unique<TextureManager>(renderer);
@@ -37,9 +38,16 @@ bool SDL3Backend::initImpl(const EngineConfig& config) {
         return false;
     }
     
+    // Initialize ImGui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+    ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
+    ImGui_ImplSDLRenderer3_Init(renderer);
+
     // Set VSync
     SDL_SetRenderVSync(renderer, config.vsync ? 1 : 0);
-    
+
     // Initialize TTF
     if (!TTF_Init()) {
         SDL_Log("TTF_Init failed: %s", SDL_GetError());
@@ -52,10 +60,14 @@ bool SDL3Backend::initImpl(const EngineConfig& config) {
 void SDL3Backend::shutdownImpl() {
     if (running) {
         running = false;
+        //textureManager.reset(); // Why cannot reset without crashing?
+
+        // Cleanup ImGui
+        ImGui_ImplSDLRenderer3_Shutdown();
+        ImGui_ImplSDL3_Shutdown();
+        ImGui::DestroyContext();
         TTF_Quit();
-        
-        textureManager.reset();
-        
+
         if (renderer) {
             SDL_DestroyRenderer(renderer);
             renderer = nullptr;
@@ -64,7 +76,7 @@ void SDL3Backend::shutdownImpl() {
             SDL_DestroyWindow(window);
             window = nullptr;
         }
-        QuitImageLoader();
+
         SDL_Quit();
     }
 }
@@ -86,6 +98,7 @@ void SDL3Backend::renderImpl(const std::vector<RenderSnapshot2D>& snapshots) {
     if (!renderer) return;
     
     for (const auto& snapshot : snapshots) {
+        std::cout << "here\n" << std::endl;
         // Apply viewport
         if (snapshot.context.viewport.z > 0 && snapshot.context.viewport.w > 0) {
             SDL_Rect viewport = {
@@ -103,7 +116,7 @@ void SDL3Backend::renderImpl(const std::vector<RenderSnapshot2D>& snapshots) {
         }
         
         if (snapshot.customRender) {
-            snapshot.customRender(renderer);
+            snapshot.customRender();
         }
     }
     SDL_SetRenderViewport(renderer, nullptr);
@@ -130,7 +143,6 @@ void SDL3Backend::renderColoredQuad(const QuadCmd& quad) {
         static_cast<Uint8>(quad.color.g * 255),
         static_cast<Uint8>(quad.color.b * 255),
         static_cast<Uint8>(quad.color.a * 255));
-    
     SDL_RenderFillRect(renderer, &rect);
 }
 
@@ -162,15 +174,15 @@ void SDL3Backend::renderTexturedQuad(const QuadCmd& quad) {
     };
     
     // Extract destination rectangle from MVP matrix
-    glm::vec4 pos = quad.mvp[3]; // Translation
-    glm::vec3 scaleX = quad.mvp[0]; // X scale  
-    glm::vec3 scaleY = quad.mvp[1]; // Y scale
+    //glm::vec4 pos = quad.mvp[3]; // Translation
+    //glm::vec3 scaleX = quad.mvp[0]; // X scale  
+    //glm::vec3 scaleY = quad.mvp[1]; // Y scale
     
     SDL_FRect destRect = {
-        pos.x,
-        pos.y,
-        glm::length(scaleX), // Width
-        glm::length(scaleY)  // Height
+        quad.position.x,
+        quad.position.y,
+        quad.size.x,
+        quad.size.y
     };
     
     // Simple rendering without rotation for now
@@ -178,7 +190,7 @@ void SDL3Backend::renderTexturedQuad(const QuadCmd& quad) {
 }
 
 TextureHandle SDL3Backend::loadTextureImpl(const char* path) {
-    return textureManager ? textureManager->loadBMP(path) : 0;
+    return textureManager ? textureManager->loadPNGTexture(path) : 0;
 }
 
 glm::ivec2 SDL3Backend::getWindowSizeImpl() const {
@@ -203,5 +215,5 @@ void SDL3Backend::toggleFullscreenImpl() {
     SDL_SetWindowFullscreen(window, currentlyFullscreen ? 0 : SDL_WINDOW_FULLSCREEN);
     
     // Notify about window resize
-    EventStack::instance()->out.push_back({Event::WindowResized, nullptr});
+    EventStack::instance()->pushNow(Event::WindowResized, nullptr);
 }

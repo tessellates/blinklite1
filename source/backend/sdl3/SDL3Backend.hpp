@@ -2,9 +2,9 @@
 #include "RenderBackend.hpp"
 #include <SDL3/SDL.h>
 #include <memory>
+#include "CoreTypes.hpp"
 
 class TextureManager;
-class QuadRenderer;
 
 class SDL3Backend : public RenderBackend<SDL3Backend> {
     friend class RenderBackend<SDL3Backend>;
@@ -25,9 +25,13 @@ public:
     void* getNativeRendererImpl();
     
 private:
+
+    void renderQuad(const QuadCmd& quad);
+    void renderColoredQuad(const QuadCmd& quad);
+    void renderTexturedQuad(const QuadCmd& quad);
+
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
     std::unique_ptr<TextureManager> textureManager;
-    std::unique_ptr<QuadRenderer> quadRenderer;
     bool running = false;
 };

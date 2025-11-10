@@ -3,7 +3,6 @@
 #include "CoreTypes.hpp"
 
 struct EventData;
-class Engine;
 struct EventStack;
 
 struct BaseModule {

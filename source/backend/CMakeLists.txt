@@ -7,6 +7,7 @@ target_include_directories(${PROJECT_NAME}
 # Sources
 target_sources(${PROJECT_NAME}
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/SDL3Backend.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/TextureManager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/BaseModule.cpp
 )
+
+add_subdirectory(sdl3)

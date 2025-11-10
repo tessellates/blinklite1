@@ -5,10 +5,7 @@
 #include <unordered_map>
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
-
-// Forward declarations
-struct SDL_Renderer;
-struct SDL_Texture;
+#include <SDL3/SDL.h>
 
 struct TextureInfo {
     SDL_Texture* texture = nullptr;
@@ -30,7 +27,7 @@ public:
     // Texture loading - these return handles that may point to atlas entries
     TextureHandle loadPNGTexture(const char* path);
     SDL_Texture* getTexture(TextureHandle handle) const;
-    TextureInfo& getTextureInfo(TextureHandle handle) const;
+    const TextureInfo& getTextureInfo(TextureHandle handle) const;
     bool isValid(TextureHandle handle) const;
 
     void destroy(TextureHandle handle);
@@ -40,5 +37,5 @@ private:
     SDL_Renderer* renderer;
     std::vector<TextureInfo> textures;
     
-    void addTexture(SDL_Texture* texture, const glm::ivec2& size);
+    TextureHandle addTexture(SDL_Texture* texture, const glm::ivec2& size);
 };

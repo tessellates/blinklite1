@@ -25,6 +25,10 @@ set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${CMAKE_CURRENT_SOURCE_DIR}/build")
 include_directories(BEFORE /usr/local/include)
 set(CMAKE_FIND_FRAMEWORK LAST) 
 
+
+add_compile_options(-fsanitize=address -g)
+add_link_options(-fsanitize=address)
+
 # SDL
 find_package(SDL3 REQUIRED CONFIG)
 find_package(SDL3_ttf REQUIRED CONFIG)
@@ -43,7 +47,7 @@ add_subdirectory(source)
 # staging -- these are test executables to run
 option(BUILD_STAGING "Build staging" ON)
 if(BUILD_STAGING)
-    #add_subdirectory(staging) 
+    add_subdirectory(staging) 
 endif()
 
 set(BLINKLIB ${PROJECT_NAME})
@@ -51,7 +55,7 @@ set(BLINKLIB ${PROJECT_NAME})
 # examples -- fully fletched out examples
 option(BUILD_EXAMPLES "Build examples" ON)
 if(BUILD_EXAMPLES)
-    add_subdirectory(examples) 
+    #add_subdirectory(examples) 
 endif()
 
 

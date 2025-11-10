@@ -1,19 +1,16 @@
 #pragma once
 #include "CRTP.hpp"
 #include "CoreTypes.hpp"
-#include "RenderPipeline.hpp"
 #include <memory>
 
 template<typename Derived>
 class RenderBackend : public CRTP<Derived> {
 public:
     bool init(const EngineConfig& config) {
-        pipeline = std::make_unique<RenderPipeline>();
         return this->derived().initImpl(config);
     }
     
     void shutdown() {
-        pipeline.reset();
         this->derived().shutdownImpl();
     }
     
@@ -45,8 +42,4 @@ public:
     void toggleFullscreen() {
         this->derived().toggleFullscreenImpl();
     }
-
-
-private:
-    std::unique_ptr<RenderPipeline> pipeline;
 };

@@ -111,7 +111,7 @@ inline bool snake_step(SnakeModel& m, float dt){
 inline void snake_extract(const SnakeModel& m, SnakeContext context, RenderSnapshot2D& out, bool moved){
     if (!moved) return;
     out.quads.clear();
-    out.context.viewport = {0, 0, context.w, context.h};
+    //out.context.viewport = {0, 0, context.w, context.h};
     const auto& cell = context.cell;
     const auto& xmargins = context.xmargins;
     const auto& ymargins = context.ymargins;

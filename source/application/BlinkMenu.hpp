@@ -8,7 +8,6 @@
 #include "BaseModule.hpp"
 
 class EventStack;
-class Engine;
 
 class BlinkMenu : public BaseModule
 {

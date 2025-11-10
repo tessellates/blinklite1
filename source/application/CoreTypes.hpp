@@ -30,7 +30,7 @@ struct RenderContext2D {
 struct RenderSnapshot2D {
     RenderContext2D context;
     std::vector<QuadCmd> quads;  // Single unified quad list
-    std::function<void(void*)> customRender;
+    std::function<void()> customRender;
 };
 
 using RenderSnapshots2D = std::vector<RenderSnapshot2D>;

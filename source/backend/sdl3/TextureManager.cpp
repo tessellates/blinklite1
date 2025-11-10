@@ -1,7 +1,8 @@
 #include "TextureManager.hpp"
 #include <SDL3/SDL.h>
 #include <stdexcept>
-#include "sdl_image_utils.hpp"
+#include <SDL3_image/SDL_image.h>
+#include <iostream>
 
 TextureManager::TextureManager(void* sdlRenderer)
     : renderer(static_cast<SDL_Renderer*>(sdlRenderer)) {
@@ -10,10 +11,11 @@ TextureManager::TextureManager(void* sdlRenderer)
     }
     
     // Reserve slot 0 as invalid
-    textures.push_back({});
+    textures = std::vector<TextureInfo>();
+    textures.push_back({nullptr, {0, 0}});
 }
 
-        TextureManager::~TextureManager() {
+TextureManager::~TextureManager() {
     destroyAll();
 }
 
@@ -23,7 +25,7 @@ SDL_Texture* TextureManager::getTexture(TextureHandle handle) const
     return textures[handle].texture;
 }
 
-TextureInfo& TextureManager::getTextureInfo(TextureHandle handle) const 
+const TextureInfo& TextureManager::getTextureInfo(TextureHandle handle) const 
 {
     if (!isValid(handle)) return textures[0];
     return textures[handle];
@@ -32,7 +34,7 @@ TextureInfo& TextureManager::getTextureInfo(TextureHandle handle) const
 TextureHandle TextureManager::loadPNGTexture(const char* path) {
     if (!path) return 0;
     
-    SDL_Texture* texture = LoadPNGTexture(renderer, path);
+    SDL_Texture* texture = IMG_LoadTexture(renderer, path);
     if (!texture) {
         SDL_Log("Failed to load PNG texture: %s", path);
         return 0;
@@ -70,12 +72,20 @@ void TextureManager::destroy(TextureHandle handle) {
 
 void TextureManager::destroyAll()
 {
+    std::cout << "Destroying all textures" << std::endl;
+    std::cout << textures.size() << " textures to destroy" << std::endl;
+    /*
     for (auto& info : textures) {
+        std::cout << "Checking texture for destruction" << std::endl;
         if (info.texture) {
+            std::cout << "Destroying texture" << std::endl;
             SDL_DestroyTexture(info.texture);
             info.texture = nullptr;
+            std::cout << "Texture destroyed" << std::endl;
+            
         }
     }
+    std::cout << "All textures destroyed" << std::endl;
     textures.clear();
-    textures.push_back({});
+    textures.push_back({nullptr, {0, 0}});*/
 }

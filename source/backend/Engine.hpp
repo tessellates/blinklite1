@@ -1,7 +1,6 @@
 #pragma once
 #include "Singleton.hpp"
 #include "CoreTypes.hpp"
-#include "RenderPipeline.hpp"
 #include "RenderBackend.hpp"
 #include <memory>
 #include <span>
@@ -12,7 +11,7 @@ class EngineImpl : public Singleton<EngineImpl<BackendType>> {
     
 private:
     EngineImpl() = default;
-    ~EngineImpl() { quit(); }
+    ~EngineImpl() { } //quit(); }
     
 public:
     bool init(const EngineConfig& config) {
@@ -29,8 +28,8 @@ public:
         callbacks.onEvent(event);
     }
 
-    void iterate(double dt) {
-        
+    void iterate(double dt) 
+    {
         // Game tick
         if (callbacks.tick) {
             callbacks.tick(static_cast<float>(dt));
@@ -42,7 +41,7 @@ public:
         
         // Backend handles the pipeline conversion
         backend.beginFrame();
-        backend.render(renderSnapshots);  // This does all the pipeline work
+        backend.render(renderSnapshots); 
         backend.endFrame();
     }
     
@@ -67,9 +66,12 @@ public:
     }
 
     void toggleFullscreen() {
+        isFullscreen = !isFullscreen;
         backend.toggleFullscreenImpl();
     }
     
+    bool isFullscreen = false;
+
 private:
     void handleEngineEvents(const EventData& event) {
         switch (event.action) {

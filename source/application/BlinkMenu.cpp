@@ -3,7 +3,7 @@
 #include "imgui_impl_sdlrenderer3.h"
 #include <vector>
 
-#include "Engine.hpp"
+#include "SDL3Engine.hpp"
 #include "EventStack.hpp"
 #include "CoreTypes.hpp"
 
@@ -40,14 +40,14 @@ void BlinkMenu::internals()
     if (isInitialized)
     {
         if (ImGui::Checkbox("Fullscreen", &Engine::instance()->isFullscreen)) {
-            EventStack::instance()->next.push_back({Event::FullscreenToggle, nullptr});
+            EventStack::instance()->pushNext(Event::FullscreenToggle);
         }
     }
 
     // Fullscreen toggle
     if (ImGui::Checkbox("Framerate", &this->frameRate)) 
     {
-        EventStack::instance()->next.push_back({Event::FrameRateToggle, nullptr});
+        EventStack::instance()->pushNext(Event::FrameRateToggle);
     }
     /*
     // V-Sync toggle
@@ -82,7 +82,7 @@ void BlinkMenu::addResolutions(const std::vector<std::pair<int,int>>& sizes)
 void BlinkMenu::extract( RenderSnapshots2D& s)
 {
     RenderSnapshot2D rs;
-    rs.render = [this]()
+    rs.customRender = [this]()
     {
         this->run((SDL_Renderer*)Engine::instance()->getRenderer());
     };
