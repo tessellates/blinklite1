@@ -20,7 +20,7 @@ import sys
 from scripts import script_utils
 
 # Constants
-DEFAULT_BUILD_TYPE = 'Debug'
+DEFAULT_BUILD_TYPE = 'Release'
 VENV_NAME = 'blink_lite_venv'
 BUILD_DIR = 'build'
 DATA_DIR = 'data'

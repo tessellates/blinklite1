@@ -26,8 +26,8 @@ include_directories(BEFORE /usr/local/include)
 set(CMAKE_FIND_FRAMEWORK LAST) 
 
 
-add_compile_options(-fsanitize=address -g)
-add_link_options(-fsanitize=address)
+#add_compile_options(-fsanitize=address -g)
+#add_link_options(-fsanitize=address)
 
 # SDL
 find_package(SDL3 REQUIRED CONFIG)

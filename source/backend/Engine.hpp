@@ -5,6 +5,8 @@
 #include <memory>
 #include <span>
 
+#include <iostream>
+
 template<typename BackendType>
 class EngineImpl : public Singleton<EngineImpl<BackendType>> {
     friend class Singleton<EngineImpl<BackendType>>;
@@ -43,6 +45,7 @@ public:
         backend.beginFrame();
         backend.render(renderSnapshots); 
         backend.endFrame();
+        renderSnapshots.clear();
     }
     
     void setCallbacks(const GameCallbacks& callbacks) {

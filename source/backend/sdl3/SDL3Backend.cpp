@@ -52,7 +52,7 @@ bool SDL3Backend::initImpl(const EngineConfig& config) {
     if (!TTF_Init()) {
         SDL_Log("TTF_Init failed: %s", SDL_GetError());
     }
-    
+    std::cout << "SDL3 Backend initialized." << std::endl;
     running = true;
     return true;
 }
@@ -84,7 +84,7 @@ void SDL3Backend::shutdownImpl() {
 void SDL3Backend::beginFrameImpl() {
     if (!renderer) return;
     
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_RenderClear(renderer);
 }
 
@@ -98,7 +98,6 @@ void SDL3Backend::renderImpl(const std::vector<RenderSnapshot2D>& snapshots) {
     if (!renderer) return;
     
     for (const auto& snapshot : snapshots) {
-        std::cout << "here\n" << std::endl;
         // Apply viewport
         if (snapshot.context.viewport.z > 0 && snapshot.context.viewport.w > 0) {
             SDL_Rect viewport = {
