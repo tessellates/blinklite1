@@ -22,7 +22,7 @@ struct QuadCmd {
 };
 
 struct RenderContext2D {
-    glm::vec4 viewport{0, 0, 1280, 720}; // x, y, width, height
+    glm::vec4 viewport{0, 0, 0, 0}; // x, y, width, height
     // Can add viewMatrix, projectionMatrix later when needed
 };
 

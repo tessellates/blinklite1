@@ -10,7 +10,7 @@ extern "C" SDL_AppResult SDL_AppInit(void** appstate, int, char**){             
 extern "C" SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* e){                 \
     auto* app = static_cast<AppType*>(appstate);                                     \
     if (e->type == SDL_EVENT_QUIT) return SDL_APP_SUCCESS;                           \
-    app->onEvent(*e);                                                                \
+    app->onSDLEvent(*e);                                                                \
     return SDL_APP_CONTINUE;                                                         \
 }                                                                                    \
 extern "C" SDL_AppResult SDL_AppIterate(void* appstate){                             \

@@ -9,7 +9,10 @@
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_sdlrenderer3.h"
 
-SDL3Backend::SDL3Backend() = default;
+SDL3Backend::SDL3Backend() 
+{
+
+}
 
 SDL3Backend::~SDL3Backend() {
     //shutdownImpl();
@@ -84,7 +87,7 @@ void SDL3Backend::shutdownImpl() {
 void SDL3Backend::beginFrameImpl() {
     if (!renderer) return;
     
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
     SDL_RenderClear(renderer);
 }
 
@@ -106,7 +109,7 @@ void SDL3Backend::renderImpl(const std::vector<RenderSnapshot2D>& snapshots) {
                 static_cast<int>(snapshot.context.viewport.z),
                 static_cast<int>(snapshot.context.viewport.w)
             };
-            SDL_SetRenderViewport(renderer, &viewport);
+            //SDL_SetRenderViewport(renderer, &viewport);
         }
         
         // Render all quads directly (no transformation)

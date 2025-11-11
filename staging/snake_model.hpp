@@ -56,7 +56,7 @@ inline bool snake_step(SnakeModel& m, float dt){
     m.acc += dt;
     bool moved = false;
     bool speedup= false;
-    while (m.acc >= m.step_s || (!m.reponsed && m.buffer != None)) {// || (m.buffer != None && m.acc > m.step_s/3)) {
+    while (m.acc >= m.step_s || (false && m.buffer != None)) {// || (m.buffer != None && m.acc > m.step_s/3)) {
         if (m.buffer!=None){
             m.dir = m.buffer;
             m.buffer = None;
@@ -108,8 +108,8 @@ inline bool snake_step(SnakeModel& m, float dt){
 }
 
 #include <CoreTypes.hpp>
-inline void snake_extract(const SnakeModel& m, SnakeContext context, RenderSnapshot2D& out, bool moved){
-    if (!moved) return;
+inline void snake_extract(const SnakeModel& m, SnakeContext context, RenderSnapshot2D& out, bool triggerExtract){
+    if (!triggerExtract) return;
     out.quads.clear();
     //out.context.viewport = {0, 0, context.w, context.h};
     const auto& cell = context.cell;

@@ -26,10 +26,12 @@ struct SnakeGameModule : public BaseModule
 {
     SnakeGame game;
     RenderSnapshot2D rs;
+    bool triggerExtract = false;
     void extract( RenderSnapshots2D& s) override
     {
-        snake_extract(game.model, game.context, rs, game.moved);
+        snake_extract(game.model, game.context, rs, game.moved || triggerExtract);
         s.push_back(rs);
+        triggerExtract = false;
     }
 
     void tick(float dt) override
@@ -73,23 +75,25 @@ struct MyApp : EngineAppBase {
         return true;
     }
 
-    void onIterate(const std::span<const EventData>& acts) override {
+    void onIterate(float dt) override {
         frc.frc.update();
+    }
 
-        for (auto& a: acts){
-            if (a.action == Event::Back){
-                inMenu = !inMenu;
-                mainMenu.renderEnabled = inMenu;
-                game.iterateEnabled = !inMenu;
-            }
-            if (a.action == Event::FrameRateToggle){
-                frc.renderEnabled = !frc.renderEnabled;
-            }
-            if (a.action == Event::WindowResized)
-            {
-                mainMenu.applyResolution(Engine::instance()->getWindowSize().x, Engine::instance()->getWindowSize().y);
-                game.game.context = SnakeContext{ {16,12,1}, (float)Engine::instance()->getWindowSize().x, (float)Engine::instance()->getWindowSize().y };
-            }
+    void onEvent(const EventData& a) override {
+        if (a.action == Event::Back){
+            inMenu = !inMenu;
+            mainMenu.renderEnabled = inMenu;
+            game.iterateEnabled = !inMenu;
+            game.eventEnabled = !inMenu;
+        }
+        if (a.action == Event::FrameRateToggle){
+            frc.renderEnabled = !frc.renderEnabled;
+        }
+        if (a.action == Event::WindowResized)
+        {
+            mainMenu.applyResolution(Engine::instance()->getWindowSize().x, Engine::instance()->getWindowSize().y);
+            game.game.context = SnakeContext{ {16,12,1}, (float)Engine::instance()->getWindowSize().x, (float)Engine::instance()->getWindowSize().y };
+            game.triggerExtract = true;
         }
     }
 };

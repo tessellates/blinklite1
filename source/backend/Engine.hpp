@@ -12,7 +12,10 @@ class EngineImpl : public Singleton<EngineImpl<BackendType>> {
     friend class Singleton<EngineImpl<BackendType>>;
     
 private:
-    EngineImpl() = default;
+    EngineImpl() 
+    {
+        std::cout << "EngineImpl created." << std::endl;
+    }
     ~EngineImpl() { } //quit(); }
     
 public:
@@ -89,7 +92,7 @@ private:
         }
     }
     
-    RenderBackend<BackendType> backend;  // Contains pipeline internally
+    BackendType backend;  // Contains pipeline internally
     GameCallbacks callbacks;
     std::vector<RenderSnapshot2D> renderSnapshots;
 };

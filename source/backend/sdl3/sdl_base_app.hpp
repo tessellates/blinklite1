@@ -23,7 +23,8 @@ struct EngineAppBase {
 
     virtual bool onInit() = 0;
     virtual void onShutdown(int) {}
-    virtual void onIterate(const std::span<const EventData>&) {}
+    virtual void onIterate(float dt) {}
+    virtual void onEvent(const EventData& e) {}
 
     bool init(){
         onInit();
@@ -60,17 +61,20 @@ struct EngineAppBase {
         Engine::instance()->setCallbacks(cb);
     }
 
-    void onEvent(const SDL_Event& e){ 
+    void onSDLEvent(const SDL_Event& e)
+    { 
         ImGui_ImplSDL3_ProcessEvent(&e); 
-        xlat.on_event(e, *EventStack::instance()); }
+        xlat.on_event(e, *EventStack::instance()); 
+    }
 
     void iterate()
     {
         while(EventStack::instance()->poll(event)) {
+            onEvent(event);
             Engine::instance()->onEvent(event);
         }
-        //onIterate(acts);
         clock.update();
+        onIterate(clock.getDeltaTime());
         Engine::instance()->iterate(clock.getDeltaTime());
         EventStack::instance()->reset();
     }
