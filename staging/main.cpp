@@ -32,14 +32,54 @@ struct BattleZoneGameModule : public BaseModule
     }
 };
 
+struct FrameRateCounterModule : public BaseModule
+{
+    FrameRateCounter frc;
+    void extract( RenderSnapshots2D& s) override
+    {
+        RenderSnapshot2D rs;
+        rs.customRender = [this]()
+        {
+            frc.render();
+        };
+        s.push_back(rs);
+    }
+    void tick(float dt) override {
+        frc.update();
+    }
+
+};
+
+
 struct MyApp : EngineAppBase {
     BattleZoneGameModule game;
-    
+    bool inMenu = false;
+    BlinkMenu mainMenu; 
+    FrameRateCounterModule frc;
     bool onInit() override {
         Engine::instance()->init(EngineConfig{1280, 720, "BattleZone", "0.1", "battlezone_demo", true});
+
+        mainMenu.applyResolution(1280,720);
+        TTF_Font* font = TTF_OpenFont("assets/Arial.ttf", 12);
+        if (!font) {
+            std::cout << SDL_GetError() << std::endl;
+        }
+        frc.frc = FrameRateCounter((SDL_Renderer*)Engine::instance()->getRenderer(), font);
+
         game.drawOrder = 0;
         game.updateOrder = 0;
+
+        mainMenu.drawOrder = 1;
+        mainMenu.updateOrder = 1;
+        mainMenu.renderEnabled = false;
+        frc.drawOrder = 2;
+        frc.updateOrder = 2;
+        frc.renderEnabled = false;
+
         addModule(&game);
+        addModule(&mainMenu);
+        addModule(&frc);
+
         return true;
     }
 
@@ -48,7 +88,15 @@ struct MyApp : EngineAppBase {
     }
 
     void onEvent(const EventData& a) override {
-        // Handle app-level events
+        if (a.action == Event::Back){
+            inMenu = !inMenu;
+            mainMenu.renderEnabled = inMenu;
+            game.iterateEnabled = !inMenu;
+            game.eventEnabled = !inMenu;
+        }
+        if (a.action == Event::FrameRateToggle){
+            frc.renderEnabled = !frc.renderEnabled;
+        }
     }
 };
 

@@ -63,7 +63,7 @@ bool SDL3Backend::initImpl(const EngineConfig& config) {
 void SDL3Backend::shutdownImpl() {
     if (running) {
         running = false;
-        //textureManager.reset(); // Why cannot reset without crashing?
+        textureManager.reset();
 
         // Cleanup ImGui
         ImGui_ImplSDLRenderer3_Shutdown();

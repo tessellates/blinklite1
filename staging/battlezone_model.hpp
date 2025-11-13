@@ -41,16 +41,16 @@ struct BattleZoneContext {
 
 inline void battlezone_input(BattleZoneModel& m, const EventData& e) {
     if (e.action == Event::KeyDown) {
-        KeyboardKey key = (KeyboardKey)(uintptr_t)e.data;
+        KeyboardKey key = *static_cast<const KeyboardKey*>(e.data);
         switch (key) {
             case KEY_W:
             case KEY_UP:
-                m.player.speed = 100.0f;
+                m.player.speed = 10.0f;
                 break;
                 
             case KEY_S:
             case KEY_DOWN:
-                m.player.speed = -50.0f;
+                m.player.speed = -5.0f;
                 break;
                 
             case KEY_A:
@@ -77,7 +77,7 @@ inline void battlezone_input(BattleZoneModel& m, const EventData& e) {
                 break;
         }
     } else if (e.action == Event::KeyUp) {
-        KeyboardKey key = (KeyboardKey)(uintptr_t)e.data;
+        KeyboardKey key = *static_cast<const KeyboardKey*>(e.data);
         switch (key) {
             case KEY_W:
             case KEY_UP:
@@ -90,14 +90,14 @@ inline void battlezone_input(BattleZoneModel& m, const EventData& e) {
                 break;
         }
     }
+    std::cout << "speed:" << m.player.speed << std::endl;
 }
 
 inline void battlezone_tick(BattleZoneModel& m, float dt) {
     // Move player
     m.player.x += sinf(m.player.angle) * m.player.speed * dt;
     m.player.z += cosf(m.player.angle) * m.player.speed * dt;
-    
-    // Move shots
+        // Move shots   
     for (auto& shot : m.shots) {
         shot.x += shot.dx * dt;
         shot.z += shot.dz * dt;
