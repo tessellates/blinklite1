@@ -1,6 +1,7 @@
 #pragma once
 #include "Event.hpp"
 #include "EventStack.hpp"
+#include "SDLKeyMap.hpp"
 #include <SDL3/SDL.h>
 
 #include <vector>
@@ -22,6 +23,12 @@ struct SdlTranslator {
 
         case SDL_EVENT_KEY_DOWN: {
             const SDL_Scancode s = e.key.scancode;
+            
+            // Emit KeyDown event with translated key
+            KeyboardKey mappedKey = SDLKeyMapper::translateKey(s);
+            stack.pushNow(Event::KeyDown, mappedKey);
+            
+            // Keep existing legacy event handling
             if (s==SDL_SCANCODE_ESCAPE) stack.pushNow(Event::Back);
             if (s==SDL_SCANCODE_RETURN) stack.pushNow(Event::Confirm);
             if (s==SDL_SCANCODE_P)      stack.pushNow(Event::Pause);
@@ -35,6 +42,11 @@ struct SdlTranslator {
 
         case SDL_EVENT_KEY_UP: {
             const SDL_Scancode s = e.key.scancode;
+            
+            // Emit KeyUp event with translated key
+            KeyboardKey mappedKey = SDLKeyMapper::translateKey(s);
+            stack.pushNow(Event::KeyUp, mappedKey);
+            
             if (s==SDL_SCANCODE_A || s==SDL_SCANCODE_LEFT)  stack.holdL = false;
             if (s==SDL_SCANCODE_D || s==SDL_SCANCODE_RIGHT) stack.holdR = false;
             if (s==SDL_SCANCODE_W || s==SDL_SCANCODE_UP)    stack.holdU = false;

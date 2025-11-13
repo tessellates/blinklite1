@@ -40,13 +40,30 @@ struct BattleZoneContext {
 };
 
 inline void battlezone_input(BattleZoneModel& m, const EventData& e) {
-    if (e.type == SDL_EVENT_KEY_DOWN) {
-        switch (e.key.key) {
-            case SDLK_W: m.player.speed = 100.0f; break;
-            case SDLK_S: m.player.speed = -50.0f; break;   
-            case SDLK_A: m.player.angle -= 0.1f; break;
-            case SDLK_D: m.player.angle += 0.1f; break;
-            case SDLK_SPACE:
+    if (e.action == Event::KeyDown) {
+        KeyboardKey key = (KeyboardKey)(uintptr_t)e.data;
+        switch (key) {
+            case KEY_W:
+            case KEY_UP:
+                m.player.speed = 100.0f;
+                break;
+                
+            case KEY_S:
+            case KEY_DOWN:
+                m.player.speed = -50.0f;
+                break;
+                
+            case KEY_A:
+            case KEY_LEFT:
+                m.player.angle -= 0.1f;
+                break;
+                
+            case KEY_D:
+            case KEY_RIGHT:
+                m.player.angle += 0.1f;
+                break;
+                
+            case KEY_SPACE:
                 // Fire shot
                 m.shots.push_back({
                     m.player.x, m.player.z,
@@ -55,11 +72,22 @@ inline void battlezone_input(BattleZoneModel& m, const EventData& e) {
                     3.0f
                 });
                 break;
+                
+            default:
+                break;
         }
-    } else if (e.type == SDL_EVENT_KEY_UP) {
-        switch (e.key.key) {
-            case SDLK_W:
-            case SDLK_S: m.player.speed = 0; break;
+    } else if (e.action == Event::KeyUp) {
+        KeyboardKey key = (KeyboardKey)(uintptr_t)e.data;
+        switch (key) {
+            case KEY_W:
+            case KEY_UP:
+            case KEY_S:
+            case KEY_DOWN:
+                m.player.speed = 0;
+                break;
+                
+            default:
+                break;
         }
     }
 }
