@@ -5,11 +5,13 @@
 #include <cmath>
 #include <random>
 #include <algorithm>
+#include <iostream>
 
 struct Tank {
     float x = 0, z = 0;
     float angle = 0;
     float speed = 0;
+    float turnSpeed = 0;
     bool alive = true;
 };
 
@@ -17,6 +19,7 @@ struct Enemy {
     float x, z;
     float angle;
     bool alive = true;
+    float spawnTime = 0;
 };
 
 struct Shot {
@@ -31,6 +34,7 @@ struct BattleZoneModel {
     std::vector<Shot> shots;
     float spawnTimer = 0;
     int score = 0;
+    float gameTime = 0;
 };
 
 struct BattleZoneContext {
@@ -45,32 +49,36 @@ inline void battlezone_input(BattleZoneModel& m, const EventData& e) {
         switch (key) {
             case KEY_W:
             case KEY_UP:
-                m.player.speed = 10.0f;
+                m.player.speed = 150.0f; // Faster movement
                 break;
                 
             case KEY_S:
             case KEY_DOWN:
-                m.player.speed = -5.0f;
+                m.player.speed = -75.0f; // Reverse
                 break;
                 
             case KEY_A:
             case KEY_LEFT:
-                m.player.angle -= 0.1f;
+                m.player.turnSpeed = -2.5f; // Smooth turning
                 break;
                 
             case KEY_D:
             case KEY_RIGHT:
-                m.player.angle += 0.1f;
+                m.player.turnSpeed = 2.5f; // Smooth turning
                 break;
                 
             case KEY_SPACE:
-                // Fire shot
-                m.shots.push_back({
-                    m.player.x, m.player.z,
-                    sinf(m.player.angle) * 200.0f,
-                    cosf(m.player.angle) * 200.0f,
-                    3.0f
-                });
+                // Fire shot with cooldown (prevent spam)
+                static float lastShot = 0;
+                if (m.gameTime - lastShot > 0.2f) {
+                    m.shots.push_back({
+                        m.player.x, m.player.z,
+                        sinf(m.player.angle) * 300.0f, // Faster shots
+                        cosf(m.player.angle) * 300.0f,
+                        3.0f
+                    });
+                    lastShot = m.gameTime;
+                }
                 break;
                 
             default:
@@ -86,18 +94,28 @@ inline void battlezone_input(BattleZoneModel& m, const EventData& e) {
                 m.player.speed = 0;
                 break;
                 
+            case KEY_A:
+            case KEY_LEFT:
+            case KEY_D:
+            case KEY_RIGHT:
+                m.player.turnSpeed = 0;
+                break;
+                
             default:
                 break;
         }
     }
-    std::cout << "speed:" << m.player.speed << std::endl;
 }
 
 inline void battlezone_tick(BattleZoneModel& m, float dt) {
-    // Move player
+    m.gameTime += dt;
+    
+    // Smooth player movement
+    m.player.angle += m.player.turnSpeed * dt;
     m.player.x += sinf(m.player.angle) * m.player.speed * dt;
     m.player.z += cosf(m.player.angle) * m.player.speed * dt;
-        // Move shots   
+    
+    // Move shots   
     for (auto& shot : m.shots) {
         shot.x += shot.dx * dt;
         shot.z += shot.dz * dt;
@@ -110,17 +128,39 @@ inline void battlezone_tick(BattleZoneModel& m, float dt) {
                       [](const Shot& s) { return s.life <= 0; }),
         m.shots.end());
     
-    // Spawn enemies
+    // Spawn enemies more strategically
     m.spawnTimer += dt;
-    if (m.spawnTimer > 2.0f && m.enemies.size() < 5) {
+    if (m.spawnTimer > 3.0f && m.enemies.size() < 3) {
         static std::random_device rd;
         static std::mt19937 gen(rd());
-        std::uniform_real_distribution<> dis(-500, 500);
+        
+        // Spawn enemies further away in a circle around player
+        std::uniform_real_distribution<> angleDis(0, 2 * M_PI);
+        std::uniform_real_distribution<> distDis(200, 400);
+        
+        float spawnAngle = (float)angleDis(gen);
+        float spawnDist = (float)distDis(gen);
         
         m.enemies.push_back({
-            (float)dis(gen), (float)dis(gen), 0, true
+            m.player.x + cosf(spawnAngle) * spawnDist,
+            m.player.z + sinf(spawnAngle) * spawnDist,
+            0, true, m.gameTime
         });
         m.spawnTimer = 0;
+    }
+    
+    // Move enemies toward player (simple AI)
+    for (auto& enemy : m.enemies) {
+        if (!enemy.alive) continue;
+        
+        float dx = m.player.x - enemy.x;
+        float dz = m.player.z - enemy.z;
+        float dist = sqrtf(dx*dx + dz*dz);
+        
+        if (dist > 5.0f) {
+            enemy.x += (dx / dist) * 30.0f * dt; // Move toward player
+            enemy.z += (dz / dist) * 30.0f * dt;
+        }
     }
     
     // Check collisions (shots vs enemies)
@@ -129,7 +169,7 @@ inline void battlezone_tick(BattleZoneModel& m, float dt) {
             if (enemy.alive) {
                 float dx = shot.x - enemy.x;
                 float dz = shot.z - enemy.z;
-                if (dx*dx + dz*dz < 25*25) {
+                if (dx*dx + dz*dz < 30*30) { // Larger hit radius
                     enemy.alive = false;
                     shot.life = 0;
                     m.score += 100;
@@ -148,79 +188,116 @@ inline void battlezone_tick(BattleZoneModel& m, float dt) {
 inline void battlezone_extract(const BattleZoneModel& m, BattleZoneContext context, RenderSnapshot2D& out) {
     out.quads.clear();
     
-    // Draw horizon line
+    // Draw ground (dark green below horizon)
+    QuadCmd ground;
+    ground.position = {0, context.horizon};
+    ground.size = {context.screenWidth, context.screenHeight - context.horizon};
+    ground.color = {0, 0.2f, 0, 1}; // Dark green ground
+    ground.tex = 0;
+    out.quads.push_back(ground);
+    
+    // Draw sky (dark blue above horizon)
+    QuadCmd sky;
+    sky.position = {0, 0};
+    sky.size = {context.screenWidth, context.horizon};
+    sky.color = {0, 0, 0.2f, 1}; // Dark blue sky
+    sky.tex = 0;
+    out.quads.push_back(sky);
+    
+    // Draw horizon line (brighter green)
     QuadCmd horizon;
-    horizon.position = {0, context.horizon};
+    horizon.position = {0, context.horizon - 1};
     horizon.size = {context.screenWidth, 2};
-    horizon.color = {0, 1, 0, 1}; // Green
+    horizon.color = {0, 0.8f, 0, 1}; // Bright green horizon
     horizon.tex = 0;
     out.quads.push_back(horizon);
     
-    // Simple 3D-to-2D projection function
+    // Improved 3D-to-2D projection
     auto project = [&](float worldX, float worldZ) -> glm::vec2 {
         // Translate to player space
         float relX = worldX - m.player.x;
         float relZ = worldZ - m.player.z;
         
-        // Rotate by player angle
+        // Rotate by player angle (fixed coordinate system)
         float cos_a = cosf(-m.player.angle);
         float sin_a = sinf(-m.player.angle);
         float rotX = relX * cos_a - relZ * sin_a;
         float rotZ = relX * sin_a + relZ * cos_a;
         
-        if (rotZ <= 1.0f) return {-1000, -1000}; // Behind player
+        if (rotZ <= 1.0f) return {-10000, -10000}; // Behind player
         
-        // Project to screen
-        float screenX = context.screenWidth * 0.5f + (rotX / rotZ) * 400.0f;
-        float screenY = context.horizon - (50.0f / rotZ) * 100.0f; // Simple height
+        // Improved perspective projection
+        float perspective = 800.0f / rotZ; // FOV scaling
+        float screenX = context.screenWidth * 0.5f + rotX * perspective;
+        float screenY = context.horizon + (20.0f * perspective); // Object height on ground
         
         return {screenX, screenY};
     };
     
-    // Draw enemies as wireframe rectangles
+    // Draw enemies with better visuals
     for (const auto& enemy : m.enemies) {
         if (!enemy.alive) continue;
         
         glm::vec2 pos = project(enemy.x, enemy.z);
-        if (pos.x < -500 || pos.x > context.screenWidth + 500) continue;
+        if (pos.x < -200 || pos.x > context.screenWidth + 200) continue;
         
-        float size = 1000.0f / (abs(enemy.z - m.player.z) + 1.0f);
-        size = std::max(2.0f, std::min(size, 50.0f));
+        float distance = sqrtf(powf(enemy.x - m.player.x, 2) + powf(enemy.z - m.player.z, 2));
+        float size = 1200.0f / (distance + 10.0f);
+        size = std::max(3.0f, std::min(size, 60.0f));
         
-        // Enemy body (red rectangle)
-        QuadCmd enemyQuad;
-        enemyQuad.position = {pos.x - size/2, pos.y - size};
-        enemyQuad.size = {size, size};
-        enemyQuad.color = {1, 0, 0, 1}; // Red
-        enemyQuad.tex = 0;
-        out.quads.push_back(enemyQuad);
+        // Enemy tank body (red)
+        QuadCmd enemyBody;
+        enemyBody.position = {pos.x - size/2, pos.y - size};
+        enemyBody.size = {size, size * 0.6f};
+        enemyBody.color = {1, 0.2f, 0.2f, 1}; // Bright red
+        enemyBody.tex = 0;
+        out.quads.push_back(enemyBody);
+        
+        // Enemy tank turret (darker red)
+        QuadCmd enemyTurret;
+        enemyTurret.position = {pos.x - size/4, pos.y - size*0.8f};
+        enemyTurret.size = {size/2, size/3};
+        enemyTurret.color = {0.8f, 0, 0, 1}; // Dark red
+        enemyTurret.tex = 0;
+        out.quads.push_back(enemyTurret);
     }
     
-    // Draw shots as small green squares
+    // Draw shots (brighter and bigger)
     for (const auto& shot : m.shots) {
         glm::vec2 pos = project(shot.x, shot.z);
-        if (pos.x < 0 || pos.x > context.screenWidth) continue;
+        if (pos.x < -50 || pos.x > context.screenWidth + 50) continue;
         
         QuadCmd shotQuad;
-        shotQuad.position = {pos.x - 2, pos.y - 2};
-        shotQuad.size = {4, 4};
-        shotQuad.color = {0, 1, 1, 1}; // Cyan
+        shotQuad.position = {pos.x - 3, pos.y - 3};
+        shotQuad.size = {6, 6};
+        shotQuad.color = {1, 1, 0, 1}; // Bright yellow shots
         shotQuad.tex = 0;
         out.quads.push_back(shotQuad);
     }
     
-    // Draw crosshair
+    // Draw crosshair (better visibility)
     QuadCmd crosshairH;
-    crosshairH.position = {context.screenWidth/2 - 10, context.screenHeight/2 - 1};
-    crosshairH.size = {20, 2};
-    crosshairH.color = {1, 1, 1, 1}; // White
+    crosshairH.position = {context.screenWidth/2 - 15, context.screenHeight/2 - 1};
+    crosshairH.size = {30, 2};
+    crosshairH.color = {1, 1, 1, 0.8f}; // Semi-transparent white
     crosshairH.tex = 0;
     out.quads.push_back(crosshairH);
     
     QuadCmd crosshairV;
-    crosshairV.position = {context.screenWidth/2 - 1, context.screenHeight/2 - 10};
-    crosshairV.size = {2, 20};
-    crosshairV.color = {1, 1, 1, 1}; // White
+    crosshairV.position = {context.screenWidth/2 - 1, context.screenHeight/2 - 15};
+    crosshairV.size = {2, 30};
+    crosshairV.color = {1, 1, 1, 0.8f}; // Semi-transparent white
     crosshairV.tex = 0;
     out.quads.push_back(crosshairV);
+    
+    // Draw score (simple digits using quads - top right)
+    // This is basic, but shows the score as white rectangles
+    if (m.score > 0) {
+        QuadCmd scoreIndicator;
+        scoreIndicator.position = {context.screenWidth - 100, 20};
+        scoreIndicator.size = {80, 20};
+        scoreIndicator.color = {0.3f, 0.3f, 0.3f, 0.7f}; // Dark background for score
+        scoreIndicator.tex = 0;
+        out.quads.push_back(scoreIndicator);
+    }
 }
