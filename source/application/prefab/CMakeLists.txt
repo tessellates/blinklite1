@@ -7,9 +7,5 @@ target_include_directories(${PROJECT_NAME}
 # Sources
 target_sources(${PROJECT_NAME}
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/BlinkMenu.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/EventStack.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/GameClock.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/FrameRateCounter.cpp
 )
-
-add_subdirectory(prefab)

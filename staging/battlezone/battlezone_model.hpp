@@ -13,6 +13,8 @@ struct Tank {
     float speed = 0;
     float turnSpeed = 0;
     bool alive = true;
+    float pitch = 0.0f;      // in radians, looking up/down
+    float pitchSpeed = 0.0f;
 };
 
 struct Enemy {
@@ -49,22 +51,22 @@ inline void battlezone_input(BattleZoneModel& m, const EventData& e) {
         switch (key) {
             case KEY_W:
             case KEY_UP:
-                m.player.speed = 150.0f; // Faster movement
+                m.player.speed = 0.1f; // Faster movement
                 break;
                 
             case KEY_S:
             case KEY_DOWN:
-                m.player.speed = -75.0f; // Reverse
+                m.player.speed = -0.05f; // Reverse
                 break;
                 
             case KEY_A:
             case KEY_LEFT:
-                m.player.turnSpeed = -2.5f; // Smooth turning
+                m.player.turnSpeed = -0.0001f; // Smooth turning
                 break;
                 
             case KEY_D:
             case KEY_RIGHT:
-                m.player.turnSpeed = 2.5f; // Smooth turning
+                m.player.turnSpeed = .0001f; // Smooth turning
                 break;
                 
             case KEY_SPACE:
@@ -80,7 +82,8 @@ inline void battlezone_input(BattleZoneModel& m, const EventData& e) {
                     lastShot = m.gameTime;
                 }
                 break;
-                
+            case KEY_Q: m.player.pitchSpeed = -0.001f; break; // look up
+            case KEY_E: m.player.pitchSpeed =  0.001f; break; // look down
             default:
                 break;
         }
@@ -100,7 +103,10 @@ inline void battlezone_input(BattleZoneModel& m, const EventData& e) {
             case KEY_RIGHT:
                 m.player.turnSpeed = 0;
                 break;
-                
+            case KEY_Q:
+            case KEY_E:
+                m.player.pitchSpeed = 0;
+                break;
             default:
                 break;
         }
@@ -110,11 +116,15 @@ inline void battlezone_input(BattleZoneModel& m, const EventData& e) {
 inline void battlezone_tick(BattleZoneModel& m, float dt) {
     m.gameTime += dt;
     
-    // Smooth player movement
     m.player.angle += m.player.turnSpeed * dt;
+
+    // Forward = +Z, angle 0 looks down +Z
     m.player.x += sinf(m.player.angle) * m.player.speed * dt;
     m.player.z += cosf(m.player.angle) * m.player.speed * dt;
-    
+    m.player.pitch += m.player.pitchSpeed * dt;
+
+    // clamp to avoid looking backwards
+    m.player.pitch = std::clamp(m.player.pitch, -0.5f, 0.5f); 
     // Move shots   
     for (auto& shot : m.shots) {
         shot.x += shot.dx * dt;
@@ -150,6 +160,7 @@ inline void battlezone_tick(BattleZoneModel& m, float dt) {
     }
     
     // Move enemies toward player (simple AI)
+    /*
     for (auto& enemy : m.enemies) {
         if (!enemy.alive) continue;
         
@@ -161,7 +172,7 @@ inline void battlezone_tick(BattleZoneModel& m, float dt) {
             enemy.x += (dx / dist) * 30.0f * dt; // Move toward player
             enemy.z += (dz / dist) * 30.0f * dt;
         }
-    }
+    }*/
     
     // Check collisions (shots vs enemies)
     for (auto& shot : m.shots) {
@@ -212,28 +223,35 @@ inline void battlezone_extract(const BattleZoneModel& m, BattleZoneContext conte
     horizon.tex = 0;
     out.quads.push_back(horizon);
     
-    // Improved 3D-to-2D projection
     auto project = [&](float worldX, float worldZ) -> glm::vec2 {
-        // Translate to player space
         float relX = worldX - m.player.x;
         float relZ = worldZ - m.player.z;
-        
-        // Rotate by player angle (fixed coordinate system)
-        float cos_a = cosf(-m.player.angle);
-        float sin_a = sinf(-m.player.angle);
-        float rotX = relX * cos_a - relZ * sin_a;
-        float rotZ = relX * sin_a + relZ * cos_a;
-        
-        if (rotZ <= 1.0f) return {-10000, -10000}; // Behind player
-        
-        // Improved perspective projection
-        float perspective = 800.0f / rotZ; // FOV scaling
-        float screenX = context.screenWidth * 0.5f + rotX * perspective;
-        float screenY = context.horizon + (20.0f * perspective); // Object height on ground
-        
+
+        float ca = cosf(m.player.angle);
+        float sa = sinf(m.player.angle);
+
+        float camX =  relX * ca - relZ * sa;
+        float camZ =  relX * sa + relZ * ca;
+
+        if (camZ <= 1.0f)
+            return {-10000, -10000};
+
+        float perspective = 800.0f / camZ;
+
+        float screenX = context.screenWidth * 0.5f + camX * perspective;
+
+        float objectHeight = 20.0f;
+
+        // pitch controls vertical look direction
+        float pitchOffset = tanf(m.player.pitch) * camZ;
+
+        float screenY = context.horizon 
+            + (objectHeight * perspective)
+            - pitchOffset;
+
         return {screenX, screenY};
     };
-    
+        
     // Draw enemies with better visuals
     for (const auto& enemy : m.enemies) {
         if (!enemy.alive) continue;

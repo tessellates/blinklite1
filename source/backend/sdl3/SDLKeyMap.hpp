@@ -12,7 +12,7 @@ private:
         
         // Initialize all to invalid/unmapped
         for (int i = 0; i < SDL_SCANCODE_COUNT; i++) {
-            keyMap[i] = KEY_A; // fallback
+            keyMap[i] = KEY_NONE; // fallback
         }
         
         // Map the keys we care about
@@ -61,6 +61,8 @@ private:
         keyMap[SDL_SCANCODE_DOWN] = KEY_DOWN;
         keyMap[SDL_SCANCODE_LEFT] = KEY_LEFT;
         keyMap[SDL_SCANCODE_RIGHT] = KEY_RIGHT;
+        keyMap[SDL_SCANCODE_LSHIFT] = KEY_LSHIFT;
+        keyMap[SDL_SCANCODE_RSHIFT] = KEY_RSHIFT;
         
         initialized = true;
     }
@@ -68,7 +70,7 @@ private:
 public:
     static KeyboardKey translateKey(SDL_Scancode sdlKey) {
         initializeMap();
-        return (sdlKey < SDL_SCANCODE_COUNT) ? keyMap[sdlKey] : KEY_A;
+        return (sdlKey < SDL_SCANCODE_COUNT) ? keyMap[sdlKey] : KEY_NONE;
     }
 };
 

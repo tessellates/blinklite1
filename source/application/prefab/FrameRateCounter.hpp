@@ -4,13 +4,18 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <string>
 
-class FrameRateCounter 
+#include "BaseModule.hpp"
+
+class FrameRateCounter : public BaseModule
 {
 public:
     FrameRateCounter() = default;
     FrameRateCounter(SDL_Renderer* renderer, TTF_Font* font); 
     void update(); 
     void render(); 
+
+    void tick(float dt) override;
+    void extract( RenderSnapshots2D& s) override;
 
 private:
     SDL_Renderer* renderer;

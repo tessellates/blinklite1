@@ -48,7 +48,10 @@ enum KeyboardKey {
     KEY_RIGHT,
     
     // Modifiers
-    KEY_SHIFT,
+    KEY_LSHIFT,
+    KEY_RSHIFT,
     KEY_CTRL,
-    KEY_ALT
+    KEY_ALT,
+
+    KEY_NONE
 };

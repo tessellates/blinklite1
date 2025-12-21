@@ -8,6 +8,8 @@
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_sdlrenderer3.h"
+#include "imgui_impl_sdlgpu3.h"
+#include "staging_gpu.hpp"
 
 SDL3Backend::SDL3Backend() 
 {
@@ -47,7 +49,8 @@ bool SDL3Backend::initImpl(const EngineConfig& config) {
     ImGui::StyleColorsDark();
     ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
     ImGui_ImplSDLRenderer3_Init(renderer);
-
+    //ImGui_ImplSDL3_InitForSDLGPU(window);
+    //ImGui_ImplSDLGPU3_Init();
     // Set VSync
     SDL_SetRenderVSync(renderer, config.vsync ? 1 : 0);
 
@@ -55,6 +58,13 @@ bool SDL3Backend::initImpl(const EngineConfig& config) {
     if (!TTF_Init()) {
         SDL_Log("TTF_Init failed: %s", SDL_GetError());
     }
+
+    initGPU(gpuDevice, window, FillPipeline, LinePipeline);
+    if (!gpuDevice) {
+        SDL_Log("Failed to initialize GPU device.");
+        return false;
+    }
+
     std::cout << "SDL3 Backend initialized." << std::endl;
     running = true;
     return true;
@@ -71,6 +81,11 @@ void SDL3Backend::shutdownImpl() {
         ImGui::DestroyContext();
         TTF_Quit();
 
+        if (gpuOutputTexture) {
+            SDL_DestroyTexture(gpuOutputTexture);
+            gpuOutputTexture = nullptr;
+        }
+
         if (renderer) {
             SDL_DestroyRenderer(renderer);
             renderer = nullptr;
@@ -78,6 +93,12 @@ void SDL3Backend::shutdownImpl() {
         if (window) {
             SDL_DestroyWindow(window);
             window = nullptr;
+        }
+
+        if (gpuDevice) {
+            DestroyStagingGPUResources(gpuDevice);
+            SDL_DestroyGPUDevice(gpuDevice);
+            gpuDevice = nullptr;
         }
 
         SDL_Quit();
@@ -99,7 +120,8 @@ void SDL3Backend::endFrameImpl() {
 
 void SDL3Backend::renderImpl(const std::vector<RenderSnapshot2D>& snapshots) {
     if (!renderer) return;
-    
+    renderGPU();
+
     for (const auto& snapshot : snapshots) {
         // Apply viewport
         if (snapshot.context.viewport.z > 0 && snapshot.context.viewport.w > 0) {
@@ -218,4 +240,13 @@ void SDL3Backend::toggleFullscreenImpl() {
     
     // Notify about window resize
     EventStack::instance()->pushNow(Event::WindowResized, nullptr);
+}
+
+void SDL3Backend::renderGPU() {
+    if (!gpuDevice || !renderer) return;
+
+    renderWithCustomPipeline(gpuDevice, window, FillPipeline, LinePipeline, renderer, gpuOutputTexture);
+    if (gpuOutputTexture) {
+        SDL_RenderTexture(renderer, gpuOutputTexture, nullptr, nullptr);
+    }
 }

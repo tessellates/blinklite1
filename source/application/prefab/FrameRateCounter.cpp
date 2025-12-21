@@ -30,3 +30,18 @@ void FrameRateCounter::render() {
         SDL_DestroySurface(textSurface);
     }
 }
+
+void FrameRateCounter::tick(float dt)
+{
+    update();
+}
+
+void FrameRateCounter::extract( RenderSnapshots2D& s)
+{
+    RenderSnapshot2D rs;
+    rs.customRender = [this]()
+    {
+        render();
+    };
+    s.push_back(rs);
+}

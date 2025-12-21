@@ -2,13 +2,13 @@
 #include <SDL3/SDL_main.h>
 #include "sdl_base_app.hpp"
 #include "sdl_engine_entry.hpp"
-#include "sandslide.hpp"
+#include "battlezone_model.hpp"
 #include <BlinkMenu.hpp>
 #include <FrameRateCounter.hpp>
 
-struct SandSlideGame : public BaseModule
+struct BattleZoneGameModule : public BaseModule
 {
-    SandSlideModel game;
+    BattleZoneModel game;
     BattleZoneContext context{1280.0f, 720.0f, 360.0f};
     RenderSnapshot2D rs;
     bool triggerExtract = false;
@@ -16,28 +16,46 @@ struct SandSlideGame : public BaseModule
     void extract(RenderSnapshots2D& s) override
     {
         rs.context.viewport = {0, 0, 1280, 720};
-        sandslide_extract(game, context, rs);
+        battlezone_extract(game, context, rs);
         s.push_back(rs);
         triggerExtract = false;
     }
 
     void tick(float dt) override
     {
-        sandslide_tick(game, dt);
+        battlezone_tick(game, dt);
     }
 
     void onEvent(const EventData& event) override
     {
-        sandslide_input(game, event);
+        battlezone_input(game, event);
     }
+};
+
+struct FrameRateCounterModule : public BaseModule
+{
+    FrameRateCounter frc;
+    void extract( RenderSnapshots2D& s) override
+    {
+        RenderSnapshot2D rs;
+        rs.customRender = [this]()
+        {
+            frc.render();
+        };
+        s.push_back(rs);
+    }
+    void tick(float dt) override {
+        frc.update();
+    }
+
 };
 
 
 struct MyApp : EngineAppBase {
-    SandSlideGame game;
+    BattleZoneGameModule game;
     bool inMenu = false;
     BlinkMenu mainMenu; 
-    FrameRateCounter frc;
+    FrameRateCounterModule frc;
     bool onInit() override {
         Engine::instance()->init(EngineConfig{1280, 720, "BattleZone", "0.1", "battlezone_demo", true});
 
@@ -46,7 +64,7 @@ struct MyApp : EngineAppBase {
         if (!font) {
             std::cout << SDL_GetError() << std::endl;
         }
-        frc = FrameRateCounter((SDL_Renderer*)Engine::instance()->getRenderer(), font);
+        frc.frc = FrameRateCounter((SDL_Renderer*)Engine::instance()->getRenderer(), font);
 
         game.drawOrder = 0;
         game.updateOrder = 0;

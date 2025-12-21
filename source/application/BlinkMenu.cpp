@@ -6,6 +6,8 @@
 #include "SDL3Engine.hpp"
 #include "EventStack.hpp"
 #include "CoreTypes.hpp"
+#include "staging_gpu.hpp"
+
 
 void BlinkMenu::run(SDL_Renderer* renderer)
 {
@@ -49,6 +51,31 @@ void BlinkMenu::internals()
     {
         EventStack::instance()->pushNext(Event::FrameRateToggle);
     }
+    static float pos1x = -0.5f;
+    static float pos1y = -0.5f;
+    static float pos2x = 0.5f;
+    static float pos2y = -0.5f;
+    static float pos3x = 0.0f;
+    static float pos3y = 0.6f;  
+    if (ImGui::SliderFloat("Vertex 1 X", &pos1x, -1.0f, 1.0f)) {
+        gTriangleVertices[0] = pos1x;
+    }
+    if (ImGui::SliderFloat("Vertex 1 Y", &pos1y, -1.0f, 1.0f)) {
+        gTriangleVertices[1] = pos1y;
+    }
+    if (ImGui::SliderFloat("Vertex 2 X", &pos2x, -1.0f, 1.0f)) {
+        gTriangleVertices[2] = pos2x;
+    }           
+    if (ImGui::SliderFloat("Vertex 2 Y", &pos2y, -1.0f, 1.0f)) {
+        gTriangleVertices[3] = pos2y;
+    }
+    if (ImGui::SliderFloat("Vertex 3 X", &pos3x, -1.0f, 1.0f)) {
+        gTriangleVertices[4] = pos3x;
+    }
+    if (ImGui::SliderFloat("Vertex 3 Y", &pos3y, -1.0f, 1.0f)) {
+        gTriangleVertices[5] = pos3y;
+    }
+
     /*
     // V-Sync toggle
     static bool isVsyncEnabled = false;
