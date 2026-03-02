@@ -25,7 +25,7 @@ public:
     std::vector<std::string> validResolutions;
 
 public:
-    void run(SDL_Renderer* ren);
+    void run(void* renderContext);
     void internals();
     bool isInit = false;
     bool frameRate = false;

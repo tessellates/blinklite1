@@ -44,4 +44,6 @@ private:
     SDL_GPUGraphicsPipeline* FillPipeline = nullptr;
     SDL_GPUGraphicsPipeline* LinePipeline = nullptr;
     SDL_Texture* gpuOutputTexture = nullptr;
+
+    
 };

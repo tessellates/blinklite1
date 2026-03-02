@@ -384,7 +384,8 @@ inline void renderWithCustomPipeline(SDL_GPUDevice* device,
 	SDL_GPUGraphicsPipeline*& LinePipeline,
 	SDL_Renderer* renderer,
 	SDL_Texture*& outputTexture)
-{
+{}
+    /*
 	(void)LinePipeline;
 	if (device == nullptr || window == nullptr || renderer == nullptr)
 	{

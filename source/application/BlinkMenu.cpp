@@ -9,7 +9,7 @@
 #include "staging_gpu.hpp"
 
 
-void BlinkMenu::run(SDL_Renderer* renderer)
+void BlinkMenu::run(void* renderContext)
 {
     ImGui_ImplSDLRenderer3_NewFrame();
     ImGui_ImplSDL3_NewFrame();  

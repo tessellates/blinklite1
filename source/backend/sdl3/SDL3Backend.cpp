@@ -120,7 +120,7 @@ void SDL3Backend::endFrameImpl() {
 
 void SDL3Backend::renderImpl(const std::vector<RenderSnapshot2D>& snapshots) {
     if (!renderer) return;
-    renderGPU();
+    //renderGPU();
 
     for (const auto& snapshot : snapshots) {
         // Apply viewport

@@ -41,3 +41,4 @@ struct GameCallbacks {
     std::function<void(float)> tick; // dt
     std::function<void(RenderSnapshots2D&)> extract; // on-screen render
 };
+
